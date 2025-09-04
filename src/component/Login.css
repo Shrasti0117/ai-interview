@@ -1,0 +1,115 @@
+/* Overall page background */
+.loginsignup {
+  width: 100%;
+  min-height: 100vh;
+  padding: 100px 20px;
+  background: linear-gradient(to right, #0056b3, #007bff); /* gradient for depth */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Main container */
+.loginsignup-container {
+  width: 100%;
+  max-width: 500px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  padding: 50px 40px;
+  box-sizing: border-box;
+  transition: transform 0.3s ease;
+}
+
+.loginsignup-container:hover {
+  transform: translateY(-5px); /* slight lift on hover */
+}
+
+/* Header */
+.loginsignup-container h1 {
+  margin-bottom: 30px;
+  font-size: 28px;
+  text-align: center;
+  color: #333;
+}
+
+/* Input fields */
+.loginsignup-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.loginsignup-fields input {
+  height: 50px;
+  padding: 0 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  color: #333;
+  transition: border 0.3s ease;
+}
+
+.loginsignup-fields input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+/* Button */
+.loginsignup-container button {
+  width: 100%;
+  height: 50px;
+  margin-top: 30px;
+  background: #ff4141;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.loginsignup-container button:hover {
+  background: #e93b3b;
+}
+
+/* Bottom login text */
+.loginsignup-login {
+  margin-top: 20px;
+  color: #666;
+  font-size: 16px;
+  text-align: center;
+}
+
+.loginsignup-login span {
+  color: #ff4141;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.loginsignup-login span:hover {
+  color: #e93b3b;
+}
+
+.loginsignup-agree {
+  display: flex;
+  align-items: center;
+  margin-top: 25px;
+  gap: 10px;
+  color: #555;
+  font-size: 14px;
+}
+
+.login_btn a {
+  text-decoration: none;
+  color: white;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
