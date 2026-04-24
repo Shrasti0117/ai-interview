@@ -1,0 +1,189 @@
+/* Aptitude.css */
+
+.page-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: 40px auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.header-title {
+  font-weight: 600;
+  font-size: 24px;
+  color: #333;
+  padding-left: 60px;
+}
+
+.timer-info {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  color: #333;
+}
+
+.timer-icon {
+  margin-right: 5px;
+  color: #3498db;
+}
+
+.progress-container {
+  margin-bottom: 30px;
+}
+
+.progress-text {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.progress-bar {
+  height: 8px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-indicator {
+  height: 100%;
+  background-color: #3498db;
+  transition: width 0.3s ease-in-out;
+}
+
+.question-box {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.question-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.topic-tag {
+  background-color: #e8f0fe;
+  color: #3498db;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.question-text {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.option-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.option {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 15px 20px;
+  margin-bottom: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.option:hover {
+  background-color: #f0f8ff;
+  border-color: #3498db;
+}
+
+
+.radio-input {
+  appearance: none; 
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ccc;
+  border-radius: 50%;
+  margin-right: 15px;
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+
+.radio-input:checked::after {
+  content: "";
+  position: absolute;
+  top: 3px; 
+  left: 3px;
+  width: 8px;
+  height: 8px;
+  background-color: #3498db; 
+  border-radius: 50%;
+}
+
+
+.footer-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+}
+
+.button {
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  font-size: 16px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.previous-button {
+  background-color: #fff;
+  color: #3498db;
+  border: 1px solid #3498db;
+}
+
+.previous-button:hover {
+  background-color: #3498db;
+  color: #fff;
+}
+
+.next-button {
+  background-color: #3498db;
+  color: #fff;
+}
+
+.next-button:hover {
+  background-color: #217dbb;
+}
+
+.submit-button {
+  background-color: #e74c3c;
+  color: #fff;
+}
+
+.submit-button:hover {
+  background-color: #c0392b;
+}
