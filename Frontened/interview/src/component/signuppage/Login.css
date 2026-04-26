@@ -1,0 +1,103 @@
+/* Full Page Background */
+.loginsignup {
+  width: 100%;
+  min-height: 100vh;
+  padding: 100px 20px;
+  background: linear-gradient(to right, #0056b3, #007bff);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Main White Box */
+.loginsignup-container {
+  width: 100%;
+  max-width: 450px;
+  background: #fff;
+  padding: 40px 35px;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.loginsignup-container:hover {
+  transform: translateY(-5px);
+}
+
+/* Heading */
+.loginsignup-container h1 {
+  text-align: center;
+  color: #333;
+  font-size: 28px;
+  margin-bottom: 25px;
+}
+
+/* Inputs */
+.loginsignup-container input {
+  width: 100%;
+  height: 50px;
+  margin-top: 18px;
+  padding: 0 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  color: #333;
+  transition: border 0.3s ease;
+}
+
+.loginsignup-container input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+/* Submit Button */
+.loginsignup-container button {
+  width: 100%;
+  height: 50px;
+  margin-top: 30px;
+  background: #ff4141;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.loginsignup-container button:hover {
+  background: #e93b3b;
+}
+
+.loginsignup-container button:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+.auth-error {
+  margin-top: 14px;
+  margin-bottom: 0;
+  color: #d93025;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+}
+
+/* Toggle Text */
+.toggle-text {
+  text-align: center;
+  font-size: 16px;
+  margin-top: 20px;
+  color: #666;
+}
+
+.toggle-text span {
+  color: #ff4141;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.toggle-text span:hover {
+  color: #e93b3b;
+}
