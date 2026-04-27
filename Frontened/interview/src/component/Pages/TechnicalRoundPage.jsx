@@ -783,12 +783,92 @@ const TechnicalRoundPage = () => {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#eef2ff', fontFamily: '"Sora", sans-serif' }}>
+    <div className="technical-page" style={{ minHeight: '100vh', background: '#eef2ff', fontFamily: '"Sora", sans-serif' }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono&display=swap');
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }
+        }
+
+        html[data-theme="dark"] .technical-page {
+          background: var(--bg-page) !important;
+          color: var(--text-main);
+        }
+
+        html[data-theme="dark"] .technical-page [style*="background: #eef2ff"],
+        html[data-theme="dark"] .technical-page [style*="background: rgb(238, 242, 255)"] {
+          background: var(--bg-page) !important;
+        }
+
+        html[data-theme="dark"] .technical-page [style*="background: #fff"],
+        html[data-theme="dark"] .technical-page [style*="background: rgb(255, 255, 255)"] {
+          background: var(--bg-surface) !important;
+        }
+
+        html[data-theme="dark"] .technical-page [style*="background: #f8fafc"],
+        html[data-theme="dark"] .technical-page [style*="background: rgb(248, 250, 252)"],
+        html[data-theme="dark"] .technical-page [style*="background: #f1f5f9"],
+        html[data-theme="dark"] .technical-page [style*="background: rgb(241, 245, 249)"] {
+          background: var(--bg-surface-alt) !important;
+        }
+
+        html[data-theme="dark"] .technical-page [style*="border: 1px solid #e2e8f0"],
+        html[data-theme="dark"] .technical-page [style*="border: 1.5px solid #e2e8f0"],
+        html[data-theme="dark"] .technical-page [style*="border-bottom: 1px solid #e2e8f0"],
+        html[data-theme="dark"] .technical-page [style*="border: 1px solid rgb(226, 232, 240)"],
+        html[data-theme="dark"] .technical-page [style*="border: 1.5px solid rgb(226, 232, 240)"],
+        html[data-theme="dark"] .technical-page [style*="border-bottom: 1px solid rgb(226, 232, 240)"] {
+          border-color: var(--border-color) !important;
+        }
+
+        html[data-theme="dark"] .technical-page [style*="color: #1e293b"],
+        html[data-theme="dark"] .technical-page [style*="color: rgb(30, 41, 59)"] {
+          color: var(--text-heading) !important;
+        }
+
+        html[data-theme="dark"] .technical-page [style*="color: #64748b"],
+        html[data-theme="dark"] .technical-page [style*="color: rgb(100, 116, 139)"],
+        html[data-theme="dark"] .technical-page [style*="color: #94a3b8"],
+        html[data-theme="dark"] .technical-page [style*="color: rgb(148, 163, 184)"] {
+          color: var(--text-muted) !important;
+        }
+
+        html[data-theme="dark"] .technical-page [style*="background: #eff6ff"],
+        html[data-theme="dark"] .technical-page [style*="background: rgb(239, 246, 255)"] {
+          background: rgba(122, 162, 255, 0.14) !important;
+        }
+
+        html[data-theme="dark"] .technical-page [style*="background: #f5f3ff"],
+        html[data-theme="dark"] .technical-page [style*="background: rgb(245, 243, 255)"] {
+          background: rgba(167, 139, 250, 0.14) !important;
+        }
+
+        html[data-theme="dark"] .technical-page [style*="background: #fee2e2"],
+        html[data-theme="dark"] .technical-page [style*="background: rgb(254, 226, 226)"] {
+          background: rgba(239, 68, 68, 0.16) !important;
+        }
+
+        html[data-theme="dark"] .technical-page [style*="background: #d1fae5"],
+        html[data-theme="dark"] .technical-page [style*="background: rgb(209, 250, 229)"] {
+          background: rgba(16, 185, 129, 0.16) !important;
+        }
+
+        html[data-theme="dark"] .technical-page [style*="background: #fef3c7"],
+        html[data-theme="dark"] .technical-page [style*="background: rgb(254, 243, 199)"] {
+          background: rgba(245, 158, 11, 0.16) !important;
+        }
+
+        html[data-theme="dark"] .technical-page nav {
+          background: var(--bg-surface) !important;
+          border-bottom-color: var(--border-color) !important;
+        }
+
+        html[data-theme="dark"] .technical-page textarea[style*="background: #fff"],
+        html[data-theme="dark"] .technical-page textarea[style*="background: rgb(255, 255, 255)"] {
+          background: var(--bg-surface) !important;
+          color: var(--text-main) !important;
+          border-color: var(--border-color) !important;
         }
       `}</style>
 

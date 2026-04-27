@@ -1,10 +1,39 @@
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 :root {
-  --primary-blue: #3b82f6;
-  --text-main: #1e293b;
+  color-scheme: light;
+  --primary-blue: #2563eb;
+  --primary-accent: #0f172a;
+  --text-main: #1f2937;
   --text-muted: #64748b;
-  --bg-page: #f0f4ff;
+  --text-heading: #0f172a;
+  --bg-page: #f6f8fc;
+  --bg-surface: #ffffff;
+  --bg-surface-alt: #f8fafc;
+  --border-color: #dbe3ee;
+  --sidebar-bg: rgba(255, 255, 255, 0.94);
+  --sidebar-shadow: 0 24px 72px rgba(15, 23, 42, 0.16);
+  --sidebar-accent: linear-gradient(135deg, #2563eb, #1d4ed8);
+  --sidebar-button-bg: #eef4ff;
+  --sidebar-button-text: #1d4ed8;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --primary-blue: #7aa2ff;
+  --primary-accent: #e2e8f0;
+  --text-main: #d7e0ee;
+  --text-muted: #8fa1b8;
+  --text-heading: #f8fafc;
+  --bg-page: #0f172a;
+  --bg-surface: #111c33;
+  --bg-surface-alt: #17233b;
+  --border-color: #233149;
+  --sidebar-bg: rgba(15, 23, 42, 0.94);
+  --sidebar-shadow: 0 24px 72px rgba(0, 0, 0, 0.42);
+  --sidebar-accent: linear-gradient(135deg, #5b7cff, #3b82f6);
+  --sidebar-button-bg: rgba(122, 162, 255, 0.12);
+  --sidebar-button-text: #cfe0ff;
 }
 
 * {
@@ -15,10 +44,57 @@
 
 body {
   font-family: 'Sora', sans-serif;
-  background-color: #f0f4ff;
-  color: #1e293b;
+  background-color: var(--bg-page);
+  color: var(--text-main);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input,
+textarea,
+select {
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+html[data-theme="dark"] [style*="background: rgb(255, 255, 255)"] {
+  background: var(--bg-surface) !important;
+}
+
+html[data-theme="dark"] [style*="background-color: rgb(255, 255, 255)"] {
+  background-color: var(--bg-surface) !important;
+}
+
+html[data-theme="dark"] [style*="border: 1px solid rgb(232, 234, 237)"] {
+  border-color: var(--border-color) !important;
+}
+
+html[data-theme="dark"] [style*="color: rgb(26, 26, 46)"] {
+  color: var(--text-heading) !important;
+}
+
+html[data-theme="dark"] [style*="color: rgb(95, 99, 104)"] {
+  color: var(--text-muted) !important;
+}
+
+html[data-theme="dark"] [style*="background: #f0f4ff"],
+html[data-theme="dark"] [style*="background-color: #f0f4ff"] {
+  background: var(--bg-page) !important;
+}
+
+html[data-theme="dark"] body {
+  background:
+    radial-gradient(circle at top left, rgba(59, 130, 246, 0.12), transparent 30%),
+    linear-gradient(180deg, #0f172a 0%, #111827 100%);
 }
 
 h1, h2, h3, h4, h5, h6 {

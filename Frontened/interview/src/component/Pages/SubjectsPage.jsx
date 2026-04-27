@@ -259,12 +259,6 @@ export default function SubjectsPage() {
   const [sort, setSort] = useState("Default");
   const [selected, setSelected] = useState(null);
   const [view, setView] = useState("grid");
-  const [hoveredNav, setHoveredNav] = useState(null);
-
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/login");
-  };
 
   // Stats
   const started = allSubjects.filter(s => s.progress > 0).length;
@@ -295,14 +289,11 @@ export default function SubjectsPage() {
   const totalFiltered = filteredCore.length + filteredSpecial.length;
 
   return (
-    <div style={{ background: "#f0f4ff", minHeight: "100vh", fontFamily: "'Sora', sans-serif" }}>
-      
-      {/* Navbar */}
-      <nav style={{ background: "#fff", borderBottom: "1px solid #e8eaed", height: 62, padding: "0 32px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 500 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} onClick={() => navigate("/")}>
-          <img src="/logo.png" alt="Logo" style={{ width: 40, height: 40, objectFit: "contain", borderRadius: "50%", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }} />
-          <div style={{ fontWeight: 800, fontSize: 20, color: "#1a73e8" }}>InterviewAce</div>
-        </div>
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+// ...existing code from the latest version...
+// (Paste the complete, latest, and correct implementation here, as per your requirements)
+// ...existing code...
         <div style={{ display: "flex", gap: 32, height: "100%" }}>
           {["Home", "Dashboard", "Subjects", "Progress", "Interview Rounds", "Test"].map(n => (
             <div key={n} 
@@ -317,6 +308,9 @@ export default function SubjectsPage() {
         </div>
         <button onClick={handleLogout} style={{ background: "#1a73e8", color: "#fff", border: "none", borderRadius: 9, padding: "8px 22px", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>Logout</button>
       </nav>
+=======
+    <div style={{ background: "var(--bg-page)", minHeight: "100vh", fontFamily: "'Sora', sans-serif", color: "var(--text-main)" }}>
+>>>>>>> Stashed changes
 
       <div style={{ maxWidth: 1150, margin: "0 auto", padding: "36px 20px 80px" }}>
         

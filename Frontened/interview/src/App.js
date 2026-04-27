@@ -4,12 +4,12 @@ import Navbar from "./component/Navbar/Navbar";
 import Footer from "./component/footer/Footer";
 import Login from "./component/signuppage/Login";
 import Home from "./component/Pages/Home";
-import Subjectmain from "./component/routingpages/Subjectmain";
+import SubjectsPage from "./component/Pages/SubjectsPage";
 import Dashboard from "./component/routingpages/Dashboard";
-import Progress from "./component/routingpages/Progress";
-import InterviewRounds from "./component/routingpages/InterviewRounds";
+import ProgressPage from "./component/Pages/ProgressPage";
+import Feature from "./component/Feature/Feature";
 import HRround from "./component/roundpage/HRround";
-import TechnicalRound from "./component/roundpage/TechnicalRound";
+import TechnicalRoundPage from "./component/Pages/TechnicalRoundPage";
 import Aptitude1 from "./component/APtitude/Aptitude1";
 import Aptitudeee from "./component/APtitude/Aptitudeee";
 import Privateroute from "./component/signuppage/Privateroute";
@@ -23,13 +23,18 @@ import InterviewFeedback from "./component/HrRoundpage/InterviewFeedback";
 
 const AppContent = () => {
   const location = useLocation();
+<<<<<<< Updated upstream
   const isLoginPage = location.pathname === "/login";
   // Optionally, you can use hideGlobalNavbar if you want to hide the navbar on more pages:
   // const hideGlobalNavbar = location.pathname === "/login" || location.pathname === "/progress" || location.pathname === "/subjects" || location.pathname === "/dashboard" || location.pathname === "/technical-round" || location.pathname === "/test";
+=======
+  const isNavbarHiddenPage = ["/login", "/technical-round"].includes(location.pathname);
+  const isHrInterviewPage = ["/hr-round", "/hr-round-1", "/hr-round-2", "/interview-feedback"].includes(location.pathname);
+>>>>>>> Stashed changes
 
   return (
     <>
-      {!isLoginPage && <Navbar />}
+      {!isNavbarHiddenPage && <Navbar />}
     <Scrolltotop/>
       <Routes>
         <Route path="/login" element={<Login />} />
@@ -47,7 +52,7 @@ const AppContent = () => {
           path="/subjects"
           element={
             <Privateroute>
-              <Subjectmain />
+              <SubjectsPage />
             </Privateroute>
           }
         />
@@ -65,7 +70,7 @@ const AppContent = () => {
           path="/progress"
           element={
             <Privateroute>
-              <Progress />
+              <ProgressPage />
             </Privateroute>
           }
         />
@@ -74,7 +79,7 @@ const AppContent = () => {
           path="/interview-rounds"
           element={
             <Privateroute>
-              <InterviewRounds />
+              <Feature />
             </Privateroute>
           }
         />
@@ -119,7 +124,7 @@ const AppContent = () => {
           path="/technical-round"
           element={
             <Privateroute>
-              <TechnicalRound />
+              <TechnicalRoundPage />
             </Privateroute>
           }
         />
@@ -155,7 +160,7 @@ const AppContent = () => {
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
 
-      {!isLoginPage && <Footer />}
+      {!isNavbarHiddenPage && !isHrInterviewPage && <Footer />}
     </>
   );
 };
