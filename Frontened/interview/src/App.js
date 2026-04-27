@@ -14,6 +14,7 @@ import Aptitude1 from "./component/APtitude/Aptitude1";
 import Aptitudeee from "./component/APtitude/Aptitudeee";
 import Privateroute from "./component/signuppage/Privateroute";
 import Report from "./component/APtitude/Report";
+import TestPage from "./component/Pages/Test";
 import Scrolltotop from "./component/Scrolltotop";
 import Hrroundpage1 from "./component/HrRoundpage/Hrroundpage1";
 import Hrroundpage2Backend from "./component/HrRoundpage/Hrroundpage2Backend";
@@ -22,7 +23,7 @@ import InterviewFeedback from "./component/HrRoundpage/InterviewFeedback";
 
 const AppContent = () => {
   const location = useLocation();
-  const hideGlobalNavbar = location.pathname === "/login" || location.pathname === "/progress" || location.pathname === "/subjects" || location.pathname === "/dashboard" || location.pathname === "/technical-round";
+  const hideGlobalNavbar = location.pathname === "/login" || location.pathname === "/progress" || location.pathname === "/subjects" || location.pathname === "/dashboard" || location.pathname === "/technical-round" || location.pathname === "/test";
 
   return (
     <>
@@ -139,6 +140,15 @@ const AppContent = () => {
           }
         />
         <Route path="/report" element={<Privateroute><Report /></Privateroute>} />
+
+        <Route
+          path="/test"
+          element={
+            <Privateroute>
+              <TestPage />
+            </Privateroute>
+          }
+        />
 
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>

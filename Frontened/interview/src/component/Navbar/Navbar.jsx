@@ -26,6 +26,7 @@ const Navbar = () => {
           <li><Link to="/subjects">Subjects</Link></li>
           <li><Link to="/progress">Progress</Link></li>
           <li><Link to="/interview-rounds">Interview Rounds</Link></li>
+          <li><Link to="/test">Test</Link></li>
         </ul>
       <button className='login_btn' onClick={handleLogout}>Logout</button>
       </nav>

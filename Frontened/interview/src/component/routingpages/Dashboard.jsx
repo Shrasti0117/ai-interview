@@ -84,9 +84,12 @@ export default function Dashboard() {
       
       {/* Navbar */}
       <nav style={{ background: "#fff", borderBottom: "1px solid #e8eaed", height: 62, padding: "0 32px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 500 }}>
-        <div style={{ fontWeight: 800, fontSize: 20, color: "#1a73e8", cursor: "pointer" }} onClick={() => navigate("/")}>InterviewAce</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} onClick={() => navigate("/")}>
+          <img src="/logo.png" alt="Logo" style={{ width: 40, height: 40, objectFit: "contain", borderRadius: "50%", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }} />
+          <div style={{ fontWeight: 800, fontSize: 20, color: "#1a73e8" }}>InterviewAce</div>
+        </div>
         <div style={{ display: "flex", gap: 32, height: "100%" }}>
-          {["Home", "Dashboard", "Subjects", "Progress", "Interview Rounds"].map(n => (
+          {["Home", "Dashboard", "Subjects", "Progress", "Interview Rounds", "Test"].map(n => (
             <div key={n} 
               onMouseEnter={() => setHoveredNav(n)}
               onMouseLeave={() => setHoveredNav(null)}
@@ -139,15 +142,28 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div style={{ background: "linear-gradient(135deg, #1a73e8 0%, #1558b0 100%)", borderRadius: 20, padding: 32, color: "#fff", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div>
-                <h3 style={{ fontSize: 20, fontWeight: 800, margin: "0 0 8px 0" }}>Test Your Knowledge</h3>
-                <p style={{ margin: 0, opacity: 0.9, maxWidth: 300 }}>Take a quick 10-minute aptitude test to stay sharp.</p>
+            <div style={{ display: "flex", gap: 16 }}>
+              <div style={{ flex: 1, background: "linear-gradient(135deg, #1a73e8 0%, #1558b0 100%)", borderRadius: 20, padding: 24, color: "#fff", display: "flex", flexDirection: "column", gap: 16 }}>
+                <div>
+                  <h3 style={{ fontSize: 18, fontWeight: 800, margin: "0 0 8px 0" }}>Test Your Knowledge</h3>
+                  <p style={{ margin: 0, opacity: 0.9, fontSize: 14 }}>Take a quick 10-minute aptitude test to stay sharp.</p>
+                </div>
+                <button 
+                  onClick={() => navigate("/aptitude")}
+                  style={{ background: "#fff", color: "#1a73e8", border: "none", borderRadius: 12, padding: "10px", fontWeight: 800, cursor: "pointer", alignSelf: "flex-start" }}
+                >Take Test</button>
               </div>
-              <button 
-                onClick={() => navigate("/aptitude")}
-                style={{ background: "#fff", color: "#1a73e8", border: "none", borderRadius: 12, padding: "12px 24px", fontWeight: 800, cursor: "pointer" }}
-              >Take Test</button>
+
+              <div style={{ flex: 1, background: "linear-gradient(135deg, #9334ea 0%, #6b21a8 100%)", borderRadius: 20, padding: 24, color: "#fff", display: "flex", flexDirection: "column", gap: 16 }}>
+                <div>
+                  <h3 style={{ fontSize: 18, fontWeight: 800, margin: "0 0 8px 0" }}>Custom Practice Test</h3>
+                  <p style={{ margin: 0, opacity: 0.9, fontSize: 14 }}>Create a customized mock exam for specific topics.</p>
+                </div>
+                <button 
+                  onClick={() => navigate("/test")}
+                  style={{ background: "#fff", color: "#9334ea", border: "none", borderRadius: 12, padding: "10px", fontWeight: 800, cursor: "pointer", alignSelf: "flex-start" }}
+                >Configure Test</button>
+              </div>
             </div>
           </div>
 

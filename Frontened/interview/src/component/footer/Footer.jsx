@@ -16,8 +16,8 @@ const Footer = () => {
 
       <div className="footer-content">
         <div className="footer-column">
-          <div className="logo">
-            <FaGraduationCap className="logo-icon" />
+          <div className="logo" style={{ display: 'flex', alignItems: 'center' }}>
+            <img src="/logo.png" alt="Logo" style={{ width: 35, height: 35, objectFit: "contain", borderRadius: "50%", marginRight: 10 }} />
             <span>InterviewAce</span>
           </div>
           <p>Prepare for engineering interviews with AI-powered practice sessions.</p>

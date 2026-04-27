@@ -25,6 +25,51 @@
   transform: translateY(-5px);
 }
 
+/* Animated Logo */
+.login-logo-container {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-glow-ring {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 0%, #007bff 25%, transparent 50%, #007bff 75%, transparent 100%);
+  animation: spin 4s linear infinite;
+  opacity: 0.8;
+  filter: blur(8px);
+}
+
+.login-logo-img {
+  position: relative;
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #fff;
+  border: 3px solid #fff;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  z-index: 2;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
 /* Heading */
 .loginsignup-container h1 {
   text-align: center;
