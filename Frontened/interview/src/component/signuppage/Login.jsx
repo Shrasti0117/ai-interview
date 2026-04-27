@@ -147,6 +147,13 @@ const Login = () => {
   return (
     <div className="loginsignup">
       <div className="loginsignup-container">
+        
+        {/* Animated Logo Section */}
+        <div className="login-logo-container">
+          <div className="logo-glow-ring"></div>
+          <img src="/logo.png" alt="InterviewAce Logo" className="login-logo-img" />
+        </div>
+
         <h1>{isSignup ? "Sign Up" : "Login"}</h1>
 
         <form onSubmit={handleSubmit}>

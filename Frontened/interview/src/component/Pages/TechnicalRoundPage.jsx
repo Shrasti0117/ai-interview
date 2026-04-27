@@ -794,9 +794,12 @@ const TechnicalRoundPage = () => {
 
       {/* Navbar */}
       <nav style={{ background: '#fff', borderBottom: '1px solid #e2e8f0', height: '60px', padding: '0 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 100 }}>
-        <div style={{ fontWeight: '800', fontSize: '20px', color: '#3b82f6' }}>InterviewAce</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} onClick={() => window.location.href="/"}>
+          <img src="/logo.png" alt="Logo" style={{ width: 40, height: 40, objectFit: "contain", borderRadius: "50%", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }} />
+          <div style={{ fontWeight: '800', fontSize: '20px', color: '#3b82f6' }}>InterviewAce</div>
+        </div>
         <div style={{ display: 'flex', gap: '32px' }}>
-          {['Home', 'Dashboard', 'Subjects', 'Progress', 'Interview Rounds'].map(tab => (
+          {['Home', 'Dashboard', 'Subjects', 'Progress', 'Interview Rounds', 'Test'].map(tab => (
             <div 
               key={tab} 
               onClick={() => navigate(tab === 'Home' ? '/' : `/${tab.toLowerCase().replace(' ', '-')}`)}

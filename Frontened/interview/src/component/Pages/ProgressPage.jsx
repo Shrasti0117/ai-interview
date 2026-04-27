@@ -557,9 +557,12 @@ export default function ProgressPage() {
       <nav style={{background:"#fff",borderBottom:"1px solid #e8eaed",height:62,
         padding:"0 32px",display:"flex",alignItems:"center",justifyContent:"space-between",
         position:"sticky",top:0,zIndex:200}}>
-        <div style={{fontWeight:800,fontSize:20,color:"#1a1a2e",letterSpacing:-0.5}}>InterviewAce</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} onClick={() => navigate && navigate("/")}>
+          <img src="/logo.png" alt="Logo" style={{ width: 40, height: 40, objectFit: "contain", borderRadius: "50%", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }} />
+          <div style={{fontWeight:800,fontSize:20,color:"#1a1a2e",letterSpacing:-0.5}}>InterviewAce</div>
+        </div>
         <div style={{display:"flex",gap:28,fontSize:15}}>
-          {["Home","Dashboard","Subjects","Progress","Interview Rounds"].map(n=>(
+          {["Home","Dashboard","Subjects","Progress","Interview Rounds","Test"].map(n=>(
             <span key={n} 
               onClick={() => navigate(n === "Home" ? "/" : `/${n.toLowerCase().replace(' ', '-')}`)}
               style={{cursor:"pointer",fontWeight:n==="Progress"?700:400,

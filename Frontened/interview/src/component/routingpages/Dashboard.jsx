@@ -31,8 +31,27 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="dashboard">
-      <h1 className="title">📚 Interview Prep Dashboard</h1>
+    <div style={{ background: "#f0f4ff", minHeight: "100vh", fontFamily: "'Sora', sans-serif" }}>
+      {/* Navbar (from priyanshu branch) */}
+      <nav style={{ background: "#fff", borderBottom: "1px solid #e8eaed", height: 62, padding: "0 32px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 500 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} onClick={() => navigate("/")}>
+          <img src="/logo.png" alt="Logo" style={{ width: 40, height: 40, objectFit: "contain", borderRadius: "50%", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }} />
+          <div style={{ fontWeight: 800, fontSize: 20, color: "#1a73e8" }}>InterviewAce</div>
+        </div>
+        <div style={{ display: "flex", gap: 32, height: "100%" }}>
+          {["Home", "Dashboard", "Subjects", "Progress", "Interview Rounds", "Test"].map(n => (
+            <div key={n} 
+              onMouseEnter={() => setHoveredNav(n)}
+              onMouseLeave={() => setHoveredNav(null)}
+              onClick={() => navigate(n === "Home" ? "/" : `/${n.toLowerCase().replace(' ', '-')}`)}
+              style={{ display: "flex", alignItems: "center", height: "100%", padding: "0 4px", fontSize: 14, fontWeight: (n === "Dashboard") ? 700 : 500, color: (n === "Dashboard" || hoveredNav === n) ? "#1a73e8" : "#5f6368", borderBottom: (n === "Dashboard") ? "2px solid #1a73e8" : "2px solid transparent", cursor: "pointer", transition: "0.2s" }}
+            >
+              {n}
+            </div>
+          ))}
+        </div>
+        <button onClick={handleLogout} style={{ background: "#1a73e8", color: "#fff", border: "none", borderRadius: 9, padding: "8px 22px", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>Logout</button>
+      </nav>
 
       <div className="grid">
        
@@ -61,6 +80,7 @@ export default function Dashboard() {
           </div>
         </div>
 
+<<<<<<< HEAD
         <div className="right">
           <h2>📝 Today's Planner</h2>
           <div className="planner">
@@ -72,21 +92,70 @@ export default function Dashboard() {
                 placeholder="Add new task..."
               />
               <button onClick={addTask} className="add-btn">Add</button>
+=======
+        {/* Stats Grid */}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 16, marginBottom: 32 }}>
+          <StatCard icon="📊" value="68%" label="Overall Readiness" color="#1a73e8" bg="#e8f0fe" />
+          <StatCard icon="📚" value="12" label="Topics Today" color="#1e8e3e" bg="#e6f4ea" />
+          <StatCard icon="🏆" value="450" label="Points Earned" color="#e37400" bg="#fff3e0" />
+          <StatCard icon="🔥" value="5 Days" label="Current Streak" color="#d93025" bg="#fce8e6" />
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 24 }}>
+          
+          {/* Left Column: Learning Progress */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+            <div style={{ background: "#fff", borderRadius: 20, padding: 28, border: "1px solid #e8eaed" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                <h2 style={{ fontSize: 18, fontWeight: 800, margin: 0 }}>📖 Continue Learning</h2>
+                <button onClick={() => navigate("/subjects")} style={{ background: "transparent", color: "#1a73e8", border: "none", fontWeight: 700, cursor: "pointer" }}>View All Subjects</button>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                <SubjectMiniCard title="Data Structures & Algorithms" progress={50} color="#1a73e8" icon="⚡" onClick={() => navigate("/subjects")} />
+                <SubjectMiniCard title="Operating Systems" progress={20} color="#9334ea" icon="⚙️" onClick={() => navigate("/subjects")} />
+                <SubjectMiniCard title="DBMS" progress={35} color="#1e8e3e" icon="🗄️" onClick={() => navigate("/subjects")} />
+                <SubjectMiniCard title="System Design" progress={5} color="#e37400" icon="🏗️" onClick={() => navigate("/subjects")} />
+              </div>
+            </div>
+
+            <div style={{ display: "flex", gap: 16 }}>
+              <div style={{ flex: 1, background: "linear-gradient(135deg, #1a73e8 0%, #1558b0 100%)", borderRadius: 20, padding: 24, color: "#fff", display: "flex", flexDirection: "column", gap: 16 }}>
+                <div>
+                  <h3 style={{ fontSize: 18, fontWeight: 800, margin: "0 0 8px 0" }}>Test Your Knowledge</h3>
+                  <p style={{ margin: 0, opacity: 0.9, fontSize: 14 }}>Take a quick 10-minute aptitude test to stay sharp.</p>
+                </div>
+                <button 
+                  onClick={() => navigate("/aptitude")}
+                  style={{ background: "#fff", color: "#1a73e8", border: "none", borderRadius: 12, padding: "10px", fontWeight: 800, cursor: "pointer", alignSelf: "flex-start" }}
+                >Take Test</button>
+              </div>
+
+              <div style={{ flex: 1, background: "linear-gradient(135deg, #9334ea 0%, #6b21a8 100%)", borderRadius: 20, padding: 24, color: "#fff", display: "flex", flexDirection: "column", gap: 16 }}>
+                <div>
+                  <h3 style={{ fontSize: 18, fontWeight: 800, margin: "0 0 8px 0" }}>Custom Practice Test</h3>
+                  <p style={{ margin: 0, opacity: 0.9, fontSize: 14 }}>Create a customized mock exam for specific topics.</p>
+                </div>
+                <button 
+                  onClick={() => navigate("/test")}
+                  style={{ background: "#fff", color: "#9334ea", border: "none", borderRadius: 12, padding: "10px", fontWeight: 800, cursor: "pointer", alignSelf: "flex-start" }}
+                >Configure Test</button>
+              </div>
+>>>>>>> origin/priyanshu
             </div>
             <ul className="task-list">
-          {tasks.map((task) => (
-    <li key={task.id} className={task.completed ? "done" : ""}>
-      <div className="task-item">
-        <input
-          type="checkbox"
-          checked={task.completed}
-          onChange={() => toggleTask(task.id)}
-        />
-        <span>{task.text}</span>
-      </div>
-      <button onClick={() => deleteTask(task.id)} className="delete-btn">❌</button>
-    </li>
-  ))}
+              {tasks.map((task) => (
+                <li key={task.id} className={task.completed ? "done" : ""}>
+                  <div className="task-item">
+                    <input
+                      type="checkbox"
+                      checked={task.completed}
+                      onChange={() => toggleTask(task.id)}
+                    />
+                    <span>{task.text}</span>
+                  </div>
+                  <button onClick={() => deleteTask(task.id)} className="delete-btn">❌</button>
+                </li>
+              ))}
             </ul>
           </div>
         </div>

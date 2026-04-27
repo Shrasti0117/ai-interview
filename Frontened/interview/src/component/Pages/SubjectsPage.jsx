@@ -299,9 +299,12 @@ export default function SubjectsPage() {
       
       {/* Navbar */}
       <nav style={{ background: "#fff", borderBottom: "1px solid #e8eaed", height: 62, padding: "0 32px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 500 }}>
-        <div style={{ fontWeight: 800, fontSize: 20, color: "#1a73e8", cursor: "pointer" }} onClick={() => navigate("/")}>InterviewAce</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} onClick={() => navigate("/")}>
+          <img src="/logo.png" alt="Logo" style={{ width: 40, height: 40, objectFit: "contain", borderRadius: "50%", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }} />
+          <div style={{ fontWeight: 800, fontSize: 20, color: "#1a73e8" }}>InterviewAce</div>
+        </div>
         <div style={{ display: "flex", gap: 32, height: "100%" }}>
-          {["Home", "Dashboard", "Subjects", "Progress", "Interview Rounds"].map(n => (
+          {["Home", "Dashboard", "Subjects", "Progress", "Interview Rounds", "Test"].map(n => (
             <div key={n} 
               onMouseEnter={() => setHoveredNav(n)}
               onMouseLeave={() => setHoveredNav(null)}
