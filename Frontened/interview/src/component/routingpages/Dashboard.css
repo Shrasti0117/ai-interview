@@ -1,0 +1,208 @@
+/* ===== Dashboard Container ===== */
+.dashboard {
+  padding: 20px;
+  font-family: "Segoe UI", sans-serif;
+  color: #333;
+}
+
+.title {
+  text-align: center;
+  font-size: 28px;
+  margin-bottom: 25px;
+}
+
+
+.grid {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.left {
+  flex: 2;
+}
+
+.subject-grid {
+  display: grid;
+grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+    margin-top: 15px;
+}
+
+
+.card {
+  background: #fff;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.card h3 {
+  margin-bottom: 10px;
+  font-size: 18px;
+  color: #333;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 10px;
+  background: #eee;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+.progress {
+  height: 100%;
+  background: #4cafef;
+  border-radius: 5px;
+}
+
+.continue-btn {
+  margin-top: 10px;
+  background: #4cafef;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.continue-btn:hover {
+  background: #3a8cd1;
+}
+.right {
+  flex: 1;
+  max-width: 450px;
+  background: #fafafa;
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+
+.planner {
+  margin-top: 10px;
+}
+
+.input-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.input-row input {
+  flex: 1;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.add-btn {
+  padding: 8px 14px;
+  border: none;
+  background: #4caf50;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.add-btn:hover {
+  background: #43a047;
+}
+
+.task-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.task-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  padding: 8px 10px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  border: 1px solid #eee;
+  transition: 0.2s;
+}
+
+.task-list li:hover {
+  background: #f1f1f1;
+}
+
+.task-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.task-item input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.done span {
+  text-decoration: line-through;
+  color: gray;
+  opacity: 0.7;
+}
+
+.delete-btn {
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.delete-btn:hover {
+  color: red;
+}
+
+.quick-links {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.links {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 10px 15px;
+  border-radius: 6px;
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.btn.green {
+  background: #4caf50;
+}
+.btn.green:hover {
+  background: #388e3c;
+}
+
+.btn.purple {
+  background: #9c27b0;
+}
+.btn.purple:hover {
+  background: #7b1fa2;
+}
+
+.btn.pink {
+  background: #e91e63;
+}
+.btn.pink:hover {
+  background: #c2185b;
+}

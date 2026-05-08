@@ -1,0 +1,58 @@
+.navbar {
+  display: flex;
+  justify-content: space-between; /* space between left and right */
+  align-items: center;
+  padding: 12px 20px;
+  background-color: #fff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.navbar-icon {
+  font-size: 24px;
+  color: #2563eb;
+  background: #e0e7ff;
+  padding: 8px;
+  border-radius: 12px;
+}
+
+.navbar-logo h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.navbar-logo p {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* Right section */
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-user {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #374151;
+  background: #f3f4f6;
+  padding: 6px 10px;
+  border-radius: 20px;
+}
+
+.admin-user-icon {
+  font-size:16px;
+  color: #6b7280;
+}
