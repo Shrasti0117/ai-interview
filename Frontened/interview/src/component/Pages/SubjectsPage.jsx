@@ -1,474 +1,988 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
-// ─── DATA ────────────────────────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════════════════
+   INTERVIEWACE — Complete Frontend
+   • Works standalone with mock data (no backend needed)
+   • Connects to Express+MongoDB when API_BASE is set correctly
+   • All 13 subjects, topic-wise MCQ, timer, results, progress tracking
+   ═══════════════════════════════════════════════════════════════════ */
 
-const coreSubjects = [
-  { id:1, name:"Data Structures & Algorithms", short:"DSA",   icon:"⚡",  color:"#e8f0fe", iconColor:"#1a73e8", borderColor:"#1a73e8", progress:50, totalTopics:48, doneTopics:24, difficulty:"Hard",   diffColor:"#d93025", diffBg:"#fce8e6", questionsCount:320, tag:"Most Asked", tagColor:"#1a73e8", tagBg:"#e8f0fe", topics:["Arrays","Linked Lists","Trees","Graphs","Dynamic Programming","Sorting"] },
-  { id:2, name:"Database Management Systems", short:"DBMS",  icon:"🗄️", color:"#e6f4ea", iconColor:"#1e8e3e", borderColor:"#1e8e3e", progress:35, totalTopics:32, doneTopics:11, difficulty:"Medium", diffColor:"#e37400", diffBg:"#fff3e0", questionsCount:180, tag:"Core",      tagColor:"#1e8e3e", tagBg:"#e6f4ea", topics:["SQL","Normalization","Transactions","Indexing","ER Diagrams","NoSQL"] },
-  { id:3, name:"Operating Systems",           short:"OS",    icon:"⚙️",  color:"#f3e8fd", iconColor:"#9334ea", borderColor:"#9334ea", progress:20, totalTopics:36, doneTopics:7,  difficulty:"Hard",   diffColor:"#d93025", diffBg:"#fce8e6", questionsCount:210, tag:"Core",      tagColor:"#9334ea", tagBg:"#f3e8fd", topics:["Processes","Threads","Memory Management","Scheduling","Deadlocks","File Systems"] },
-  { id:4, name:"Computer Networks",           short:"CN",    icon:"🌐",  color:"#fce8e6", iconColor:"#d93025", borderColor:"#d93025", progress:10, totalTopics:28, doneTopics:3,  difficulty:"Medium", diffColor:"#e37400", diffBg:"#fff3e0", questionsCount:160, tag:"Core",      tagColor:"#d93025", tagBg:"#fce8e6", topics:["OSI Model","TCP/IP","HTTP/HTTPS","DNS","Routing","Security"] },
-  { id:5, name:"Software Engineering",        short:"SE",    icon:"🛠️", color:"#e8f4fd", iconColor:"#0277bd", borderColor:"#0277bd", progress:15, totalTopics:24, doneTopics:4,  difficulty:"Easy",   diffColor:"#1e8e3e", diffBg:"#e6f4ea", questionsCount:120, tag:"Core",      tagColor:"#0277bd", tagBg:"#e8f4fd", topics:["SDLC","Agile","Testing","Design Patterns","UML","DevOps"] },
-  { id:6, name:"System Design",               short:"SD",    icon:"🏗️", color:"#fff3e0", iconColor:"#e37400", borderColor:"#e37400", progress:5,  totalTopics:20, doneTopics:1,  difficulty:"Hard",   diffColor:"#d93025", diffBg:"#fce8e6", questionsCount:90,  tag:"Advanced",  tagColor:"#e37400", tagBg:"#fff3e0", topics:["Scalability","Load Balancing","Caching","Microservices","Databases","APIs"] },
-  { id:7, name:"Object-Oriented Programming", short:"OOPS",  icon:"🧩",  color:"#fbeaff", iconColor:"#7b1fa2", borderColor:"#7b1fa2", progress:60, totalTopics:22, doneTopics:13, difficulty:"Medium", diffColor:"#e37400", diffBg:"#fff3e0", questionsCount:150, tag:"Core",      tagColor:"#7b1fa2", tagBg:"#fbeaff", topics:["Inheritance","Polymorphism","Encapsulation","Abstraction","Interfaces","Design Patterns"] },
-];
+const API_BASE = "http://localhost:5001/api";   // Updated to match project backend port
 
-const specialSubjects = [
-  { id:8,  name:"Web Development",              short:"WebDev", icon:"💻",  color:"#e3f2fd", iconColor:"#1565c0", borderColor:"#1565c0", progress:45, totalTopics:40, doneTopics:18, difficulty:"Easy",   diffColor:"#1e8e3e", diffBg:"#e6f4ea", questionsCount:200, tag:"Trending",  tagColor:"#1565c0", tagBg:"#e3f2fd", topics:["HTML/CSS","JavaScript","React","REST APIs","Authentication","Deployment"] },
-  { id:9,  name:"Full Stack Development (MERN)",short:"MERN",   icon:"🚀",  color:"#e8f5e9", iconColor:"#2e7d32", borderColor:"#2e7d32", progress:30, totalTopics:50, doneTopics:15, difficulty:"Hard",   diffColor:"#d93025", diffBg:"#fce8e6", questionsCount:250, tag:"Trending",  tagColor:"#2e7d32", tagBg:"#e8f5e9", topics:["MongoDB","Express.js","React","Node.js","JWT Auth","Deployment"] },
-  { id:10, name:"Python Programming",           short:"Python", icon:"🐍",  color:"#fffde7", iconColor:"#f57f17", borderColor:"#f57f17", progress:55, totalTopics:35, doneTopics:19, difficulty:"Easy",   diffColor:"#1e8e3e", diffBg:"#e6f4ea", questionsCount:190, tag:"Popular",   tagColor:"#f57f17", tagBg:"#fffde7", topics:["Basics","OOP","Libraries","File I/O","Decorators","Generators"] },
-  { id:11, name:"Data Science",                 short:"DS",     icon:"📊",  color:"#fce4ec", iconColor:"#c2185b", borderColor:"#c2185b", progress:25, totalTopics:38, doneTopics:10, difficulty:"Hard",   diffColor:"#d93025", diffBg:"#fce8e6", questionsCount:175, tag:"Trending",  tagColor:"#c2185b", tagBg:"#fce4ec", topics:["NumPy","Pandas","ML Basics","Visualization","Statistics","Sklearn"] },
-  { id:12, name:"Compiler Design",              short:"CD",     icon:"🔧",  color:"#f1f8e9", iconColor:"#558b2f", borderColor:"#558b2f", progress:8,  totalTopics:26, doneTopics:2,  difficulty:"Hard",   diffColor:"#d93025", diffBg:"#fce8e6", questionsCount:110, tag:"Advanced",  tagColor:"#558b2f", tagBg:"#f1f8e9", topics:["Lexical Analysis","Parsing","Syntax Trees","Code Generation","Optimization","Grammars"] },
-  { id:13, name:"Theory of Computation",        short:"TOC",    icon:"🧮",  color:"#ede7f6", iconColor:"#4527a0", borderColor:"#4527a0", progress:12, totalTopics:22, doneTopics:3,  difficulty:"Hard",   diffColor:"#d93025", diffBg:"#fce8e6", questionsCount:95,  tag:"Advanced",  tagColor:"#4527a0", tagBg:"#ede7f6", topics:["Automata","DFA/NFA","Context-Free Grammars","Turing Machines","Decidability","Complexity"] },
-];
+// ────────────────────────────────────────────────────────────────────
+// GLOBAL STYLES  (injected once)
+// ────────────────────────────────────────────────────────────────────
+const GLOBAL_CSS = `
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4ff;color:#111}
+  button{font-family:inherit;cursor:pointer}
+  input{font-family:inherit}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+  .fade-in{animation:fadeIn .35s ease both}
+  .slide-up{animation:slideUp .4s ease both}
+  .spin{animation:spin 1s linear infinite}
+  .row-hover{transition:all .2s}
+  .row-hover:hover{transform:translateX(3px)}
+  ::-webkit-scrollbar{width:6px}
+  ::-webkit-scrollbar-track{background:#f0f4ff}
+  ::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .stats-grid { grid-template-columns: 1fr 1fr !important; }
+    .subject-row { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
+    .subject-row-progress { width: 100% !important; justify-content: space-between !important; }
+    .topic-grid { grid-template-columns: 1fr !important; }
+    .navbar-links { display: none !important; }
+  }
+`;
 
-const allSubjects = [...coreSubjects, ...specialSubjects];
-const FILTERS = ["All","Easy","Medium","Hard"];
-const SORT_OPTIONS = ["Default","Progress: High","Progress: Low","Name A-Z"];
+// ────────────────────────────────────────────────────────────────────
+// SUBJECTS  (all 13 subjects with full topic data)
+// ────────────────────────────────────────────────────────────────────
+const SUBJECTS = {
+  core: [
+    {
+      id:"DSA", code:"DSA", name:"Data Structures & Algorithms",
+      questions:320, difficulty:"Hard", tags:["Most Asked"], topics:48, done:24, progress:50,
+      color:"#2563eb", bg:"#eff6ff", emoji:"⚡",
+      topics_list:[
+        { name:"Arrays",             count:30, done:true  },
+        { name:"Linked Lists",       count:28, done:true  },
+        { name:"Trees",              count:35, done:false },
+        { name:"Graphs",             count:32, done:false },
+        { name:"Dynamic Programming",count:40, done:false },
+        { name:"Sorting",            count:22, done:false },
+      ],
+    },
+    {
+      id:"DBMS", code:"DBMS", name:"Database Management Systems",
+      questions:180, difficulty:"Medium", tags:["Core"], topics:32, done:11, progress:35,
+      color:"#16a34a", bg:"#f0fdf4", emoji:"🗄️",
+      topics_list:[
+        { name:"SQL",           count:28, done:true  },
+        { name:"Normalization", count:20, done:true  },
+        { name:"Transactions",  count:18, done:false },
+        { name:"Indexing",      count:22, done:false },
+        { name:"ER Diagrams",   count:15, done:false },
+        { name:"NoSQL",         count:25, done:false },
+      ],
+    },
+    {
+      id:"OS", code:"OS", name:"Operating Systems",
+      questions:210, difficulty:"Hard", tags:["Core"], topics:36, done:7, progress:20,
+      color:"#7c3aed", bg:"#faf5ff", emoji:"⚙️",
+      topics_list:[
+        { name:"Processes",         count:30, done:true  },
+        { name:"Threads",           count:22, done:false },
+        { name:"Memory Management", count:28, done:false },
+        { name:"Scheduling",        count:25, done:false },
+        { name:"Deadlocks",         count:18, done:false },
+        { name:"File Systems",      count:20, done:false },
+      ],
+    },
+    {
+      id:"CN", code:"CN", name:"Computer Networks",
+      questions:160, difficulty:"Medium", tags:["Core"], topics:28, done:3, progress:10,
+      color:"#dc2626", bg:"#fff5f5", emoji:"🌐",
+      topics_list:[
+        { name:"OSI Model",   count:20, done:true  },
+        { name:"TCP/IP",      count:25, done:false },
+        { name:"HTTP/HTTPS",  count:18, done:false },
+        { name:"DNS",         count:15, done:false },
+        { name:"Routing",     count:20, done:false },
+        { name:"Security",    count:22, done:false },
+      ],
+    },
+    {
+      id:"SE", code:"SE", name:"Software Engineering",
+      questions:120, difficulty:"Easy", tags:["Core"], topics:24, done:4, progress:15,
+      color:"#0284c7", bg:"#f0f9ff", emoji:"🔧",
+      topics_list:[
+        { name:"SDLC",           count:18, done:true  },
+        { name:"Agile",          count:20, done:false },
+        { name:"Testing",        count:22, done:false },
+        { name:"Design Patterns",count:25, done:false },
+        { name:"UML",            count:15, done:false },
+        { name:"DevOps",         count:20, done:false },
+      ],
+    },
+    {
+      id:"SD", code:"SD", name:"System Design",
+      questions:90, difficulty:"Hard", tags:["Advanced"], topics:20, done:1, progress:5,
+      color:"#d97706", bg:"#fffbeb", emoji:"🏗️",
+      topics_list:[
+        { name:"Scalability",    count:15, done:true  },
+        { name:"Load Balancing", count:12, done:false },
+        { name:"Caching",        count:14, done:false },
+        { name:"Microservices",  count:18, done:false },
+        { name:"Databases",      count:16, done:false },
+        { name:"APIs",           count:15, done:false },
+      ],
+    },
+    {
+      id:"OOPS", code:"OOPS", name:"Object-Oriented Programming",
+      questions:150, difficulty:"Medium", tags:["Core"], topics:22, done:13, progress:60,
+      color:"#7c3aed", bg:"#faf5ff", emoji:"🧩",
+      topics_list:[
+        { name:"Inheritance",    count:22, done:true  },
+        { name:"Polymorphism",   count:20, done:true  },
+        { name:"Encapsulation",  count:18, done:true  },
+        { name:"Abstraction",    count:16, done:false },
+        { name:"Interfaces",     count:20, done:false },
+        { name:"Design Patterns",count:25, done:false },
+      ],
+    },
+  ],
+  specialization: [
+    {
+      id:"WebDev", code:"WebDev", name:"Web Development",
+      questions:200, difficulty:"Easy", tags:["Trending"], topics:40, done:18, progress:45,
+      color:"#2563eb", bg:"#eff6ff", emoji:"💻",
+      topics_list:[
+        { name:"HTML/CSS",       count:30, done:true  },
+        { name:"JavaScript",     count:35, done:true  },
+        { name:"React",          count:32, done:false },
+        { name:"REST APIs",      count:25, done:false },
+        { name:"Authentication", count:20, done:false },
+        { name:"Deployment",     count:18, done:false },
+      ],
+    },
+    {
+      id:"MERN", code:"MERN", name:"Full Stack Development (MERN)",
+      questions:250, difficulty:"Hard", tags:["Trending"], topics:50, done:15, progress:30,
+      color:"#16a34a", bg:"#f0fdf4", emoji:"🚀",
+      topics_list:[
+        { name:"MongoDB",    count:35, done:true  },
+        { name:"Express.js", count:30, done:false },
+        { name:"React",      count:40, done:false },
+        { name:"Node.js",    count:38, done:false },
+        { name:"JWT Auth",   count:25, done:false },
+        { name:"Deployment", count:22, done:false },
+      ],
+    },
+    {
+      id:"Python", code:"Python", name:"Python Programming",
+      questions:190, difficulty:"Easy", tags:["Popular"], topics:35, done:19, progress:55,
+      color:"#d97706", bg:"#fffbeb", emoji:"🐍",
+      topics_list:[
+        { name:"Basics",     count:28, done:true  },
+        { name:"OOP",        count:25, done:true  },
+        { name:"Libraries",  count:30, done:true  },
+        { name:"File I/O",   count:20, done:false },
+        { name:"Decorators", count:22, done:false },
+        { name:"Generators", count:18, done:false },
+      ],
+    },
+    {
+      id:"DS", code:"DS", name:"Data Science",
+      questions:175, difficulty:"Hard", tags:["Trending"], topics:38, done:10, progress:25,
+      color:"#db2777", bg:"#fdf2f8", emoji:"📊",
+      topics_list:[
+        { name:"NumPy",       count:22, done:true  },
+        { name:"Pandas",      count:28, done:false },
+        { name:"ML Basics",   count:30, done:false },
+        { name:"Visualization",count:20, done:false },
+        { name:"Statistics",  count:25, done:false },
+        { name:"Sklearn",     count:28, done:false },
+      ],
+    },
+    {
+      id:"CD", code:"CD", name:"Compiler Design",
+      questions:110, difficulty:"Hard", tags:["Advanced"], topics:26, done:2, progress:8,
+      color:"#16a34a", bg:"#f0fdf4", emoji:"🔩",
+      topics_list:[
+        { name:"Lexical Analysis", count:18, done:true  },
+        { name:"Parsing",          count:20, done:false },
+        { name:"Syntax Trees",     count:16, done:false },
+        { name:"Code Generation",  count:18, done:false },
+        { name:"Optimization",     count:20, done:false },
+        { name:"Grammars",         count:18, done:false },
+      ],
+    },
+    {
+      id:"TOC", code:"TOC", name:"Theory of Computation",
+      questions:95, difficulty:"Hard", tags:["Advanced"], topics:22, done:3, progress:12,
+      color:"#7c3aed", bg:"#faf5ff", emoji:"🧮",
+      topics_list:[
+        { name:"Automata",              count:15, done:true  },
+        { name:"DFA/NFA",              count:18, done:false },
+        { name:"Context-Free Grammars",count:16, done:false },
+        { name:"Turing Machines",      count:14, done:false },
+        { name:"Decidability",         count:16, done:false },
+        { name:"Complexity",           count:16, done:false },
+      ],
+    },
+  ],
+};
 
-// ─── REUSABLE COMPONENTS ─────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────────
+// COMPREHENSIVE MOCK QUESTION BANK  (works with no backend)
+// ────────────────────────────────────────────────────────────────────
+const MOCK_QUESTIONS = {
+  Arrays: [
+    { _id:"a1", question:"What is the time complexity of accessing an element in an array by index?", options:[{label:"A",text:"O(1)"},{label:"B",text:"O(n)"},{label:"C",text:"O(log n)"},{label:"D",text:"O(n²)"}], correct:"A", explanation:"Arrays store elements in contiguous memory. Index-based access is O(1) because we compute address = base + index × size directly.", difficulty:"Easy" },
+    { _id:"a2", question:"Which operation is most expensive on a dynamic array (like ArrayList)?", options:[{label:"A",text:"Random access"},{label:"B",text:"Append at end"},{label:"C",text:"Insert at beginning"},{label:"D",text:"Get length"}], correct:"C", explanation:"Inserting at beginning shifts all n elements right, making it O(n). Random access is O(1), amortized append is O(1), length is O(1).", difficulty:"Medium" },
+    { _id:"a3", question:"What is the space complexity of a 2D array of size m×n?", options:[{label:"A",text:"O(m+n)"},{label:"B",text:"O(m×n)"},{label:"C",text:"O(m²)"},{label:"D",text:"O(1)"}], correct:"B", explanation:"A 2D array has m rows and n columns, so it stores m×n elements total, giving O(m×n) space complexity.", difficulty:"Easy" },
+    { _id:"a4", question:"Which sorting algorithm is best suited for nearly-sorted arrays?", options:[{label:"A",text:"Quick Sort"},{label:"B",text:"Merge Sort"},{label:"C",text:"Insertion Sort"},{label:"D",text:"Heap Sort"}], correct:"C", explanation:"Insertion Sort performs O(n) on nearly-sorted data because each element is close to its final position, requiring minimal swaps.", difficulty:"Medium" },
+    { _id:"a5", question:"What does 'Two Pointer' technique primarily optimize?", options:[{label:"A",text:"Space complexity"},{label:"B",text:"Time complexity for linear scans"},{label:"C",text:"Recursion depth"},{label:"D",text:"Cache misses"}], correct:"B", explanation:"Two pointers reduce O(n²) nested loops to O(n) by maintaining two indices that move strategically through the array.", difficulty:"Medium" },
+    { _id:"a6", question:"What is the result of rotating an array [1,2,3,4,5] right by 2 positions?", options:[{label:"A",text:"[3,4,5,1,2]"},{label:"B",text:"[4,5,1,2,3]"},{label:"C",text:"[2,3,4,5,1]"},{label:"D",text:"[5,1,2,3,4]"}], correct:"B", explanation:"Right rotation by 2: last 2 elements [4,5] come to front. Result: [4,5,1,2,3].", difficulty:"Easy" },
+    { _id:"a7", question:"Which algorithm finds the maximum subarray sum in O(n)?", options:[{label:"A",text:"Brute Force"},{label:"B",text:"Divide and Conquer"},{label:"C",text:"Kadane's Algorithm"},{label:"D",text:"Binary Search"}], correct:"C", explanation:"Kadane's Algorithm scans the array once, maintaining current and global maximum sums, achieving O(n) time with O(1) space.", difficulty:"Medium" },
+    { _id:"a8", question:"What is the worst-case time complexity of binary search on a sorted array?", options:[{label:"A",text:"O(1)"},{label:"B",text:"O(log n)"},{label:"C",text:"O(n)"},{label:"D",text:"O(n log n)"}], correct:"B", explanation:"Binary search halves the search space each step. Worst case is when element is not present: log₂(n) comparisons.", difficulty:"Easy" },
+  ],
+  Trees: [
+    { _id:"t1", question:"What is the maximum number of nodes in a binary tree of height h?", options:[{label:"A",text:"2h"},{label:"B",text:"2h+1 - 1"},{label:"C",text:"h²"},{label:"D",text:"2h - 1"}], correct:"B", explanation:"A complete binary tree of height h has 2⁰+2¹+...+2ʰ = 2ʰ⁺¹-1 nodes at maximum.", difficulty:"Medium" },
+    { _id:"t2", question:"Which traversal of a BST gives elements in sorted order?", options:[{label:"A",text:"Preorder"},{label:"B",text:"Postorder"},{label:"C",text:"Inorder"},{label:"D",text:"Level Order"}], correct:"C", explanation:"Inorder traversal (Left → Root → Right) of a BST visits nodes in ascending sorted order.", difficulty:"Easy" },
+    { _id:"t3", question:"What is the height of a balanced BST with n nodes?", options:[{label:"A",text:"O(log n)"},{label:"B",text:"O(n)"},{label:"C",text:"O(√n)"},{label:"D",text:"O(n log n)"}], correct:"A", explanation:"A balanced BST maintains O(log n) height by keeping height difference ≤1 at every node.", difficulty:"Easy" },
+    { _id:"t4", question:"What is the time complexity of LCA (Lowest Common Ancestor) in a binary tree?", options:[{label:"A",text:"O(1)"},{label:"B",text:"O(log n)"},{label:"C",text:"O(n)"},{label:"D",text:"O(n²)"}], correct:"C", explanation:"Finding LCA requires traversing the tree in worst case visiting all n nodes.", difficulty:"Medium" },
+    { _id:"t5", question:"Which data structure is used for BFS traversal of a tree?", options:[{label:"A",text:"Stack"},{label:"B",text:"Queue"},{label:"C",text:"Priority Queue"},{label:"D",text:"Deque"}], correct:"B", explanation:"BFS uses a Queue (FIFO). Each level's nodes are enqueued and processed before the next level.", difficulty:"Easy" },
+    { _id:"t6", question:"What makes an AVL tree self-balancing?", options:[{label:"A",text:"All leaves at same level"},{label:"B",text:"Balance factor ≤1 at every node"},{label:"C",text:"All nodes have 2 children"},{label:"D",text:"Red-black coloring"}], correct:"B", explanation:"AVL trees maintain balance factor (|height(left) - height(right)| ≤ 1) at every node, performing rotations when violated.", difficulty:"Hard" },
+    { _id:"t7", question:"What is the space complexity of DFS on a tree with n nodes?", options:[{label:"A",text:"O(1)"},{label:"B",text:"O(log n)"},{label:"C",text:"O(h) where h is height"},{label:"D",text:"O(n²)"}], correct:"C", explanation:"DFS uses recursion stack proportional to tree height h. For balanced tree h=O(log n), for skewed tree h=O(n).", difficulty:"Medium" },
+    { _id:"t8", question:"In a Trie, what does each node represent?", options:[{label:"A",text:"A complete word"},{label:"B",text:"A character of the key"},{label:"C",text:"A word frequency"},{label:"D",text:"A hash bucket"}], correct:"B", explanation:"Each Trie node represents a single character. A path from root to a marked node spells out a complete word.", difficulty:"Medium" },
+  ],
+  SQL: [
+    { _id:"s1", question:"Which SQL clause is used to filter groups after GROUP BY?", options:[{label:"A",text:"WHERE"},{label:"B",text:"HAVING"},{label:"C",text:"FILTER"},{label:"D",text:"ON"}], correct:"B", explanation:"HAVING filters grouped records. WHERE filters before grouping, HAVING filters after. Use HAVING with aggregate functions.", difficulty:"Easy" },
+    { _id:"s2", question:"What type of join returns all rows from both tables, filling NULL for no match?", options:[{label:"A",text:"INNER JOIN"},{label:"B",text:"LEFT JOIN"},{label:"C",text:"RIGHT JOIN"},{label:"D",text:"FULL OUTER JOIN"}], correct:"D", explanation:"FULL OUTER JOIN returns all rows from both tables. Where no match exists on either side, NULLs are filled.", difficulty:"Medium" },
+    { _id:"s3", question:"What is the difference between DELETE and TRUNCATE?", options:[{label:"A",text:"No difference"},{label:"B",text:"DELETE is DDL, TRUNCATE is DML"},{label:"C",text:"DELETE can use WHERE, TRUNCATE removes all rows"},{label:"D",text:"TRUNCATE can be rolled back, DELETE cannot"}], correct:"C", explanation:"DELETE is DML — uses WHERE, fires triggers, can rollback. TRUNCATE is DDL — removes all rows faster, minimal logging.", difficulty:"Medium" },
+    { _id:"s4", question:"Which normal form eliminates transitive dependencies?", options:[{label:"A",text:"1NF"},{label:"B",text:"2NF"},{label:"C",text:"3NF"},{label:"D",text:"BCNF"}], correct:"C", explanation:"3NF requires every non-prime attribute to be directly dependent on the primary key, not transitively through another non-prime attribute.", difficulty:"Hard" },
+    { _id:"s5", question:"What does the ACID property 'Isolation' ensure?", options:[{label:"A",text:"Data is saved permanently"},{label:"B",text:"Concurrent transactions don't interfere"},{label:"C",text:"Transaction is all-or-nothing"},{label:"D",text:"Data remains consistent"}], correct:"B", explanation:"Isolation ensures concurrent transactions execute as if serially — one transaction's intermediate state is hidden from others.", difficulty:"Medium" },
+    { _id:"s6", question:"Which index type is most efficient for range queries?", options:[{label:"A",text:"Hash Index"},{label:"B",text:"Bitmap Index"},{label:"C",text:"B-Tree Index"},{label:"D",text:"Full-Text Index"}], correct:"C", explanation:"B-Tree indexes maintain sorted order, making range queries (BETWEEN, >, <) very efficient with O(log n) traversal.", difficulty:"Hard" },
+    { _id:"s7", question:"What does SELECT DISTINCT do?", options:[{label:"A",text:"Sorts the result set"},{label:"B",text:"Returns unique rows eliminating duplicates"},{label:"C",text:"Selects all columns"},{label:"D",text:"Joins two tables"}], correct:"B", explanation:"SELECT DISTINCT removes duplicate rows from the result set, returning only unique combinations of the selected columns.", difficulty:"Easy" },
+    { _id:"s8", question:"What is a correlated subquery?", options:[{label:"A",text:"A subquery that runs once"},{label:"B",text:"A subquery referencing the outer query's column"},{label:"C",text:"A subquery in the FROM clause"},{label:"D",text:"A subquery with multiple results"}], correct:"B", explanation:"A correlated subquery references a column from the outer query and is re-executed for each row of the outer query.", difficulty:"Hard" },
+  ],
+  Processes: [
+    { _id:"p1", question:"What is a process in Operating Systems?", options:[{label:"A",text:"A program stored on disk"},{label:"B",text:"A program in execution with its own memory space"},{label:"C",text:"A CPU instruction"},{label:"D",text:"A kernel thread"}], correct:"B", explanation:"A process is a program in execution. It includes the program code, current activity (PC, registers), and its own memory space.", difficulty:"Easy" },
+    { _id:"p2", question:"Which process state comes after the 'Running' state when a process is preempted?", options:[{label:"A",text:"Terminated"},{label:"B",text:"Waiting"},{label:"C",text:"Ready"},{label:"D",text:"New"}], correct:"C", explanation:"When preempted by scheduler, process moves from Running → Ready (still in memory, not waiting for I/O).", difficulty:"Medium" },
+    { _id:"p3", question:"What is a zombie process?", options:[{label:"A",text:"A process consuming all CPU"},{label:"B",text:"A terminated process whose exit status hasn't been read by parent"},{label:"C",text:"A process waiting for I/O"},{label:"D",text:"A background daemon process"}], correct:"B", explanation:"A zombie process has completed execution but stays in the process table because its parent hasn't called wait() to read its exit status.", difficulty:"Hard" },
+    { _id:"p4", question:"What system call creates a child process in Unix?", options:[{label:"A",text:"exec()"},{label:"B",text:"clone()"},{label:"C",text:"fork()"},{label:"D",text:"spawn()"}], correct:"C", explanation:"fork() creates an exact copy of the calling process. The child gets a duplicate of the parent's memory space. exec() replaces process image.", difficulty:"Medium" },
+    { _id:"p5", question:"What is the difference between a process and a thread?", options:[{label:"A",text:"Threads have separate memory space"},{label:"B",text:"Processes share memory, threads don't"},{label:"C",text:"Threads share process memory, processes don't"},{label:"D",text:"No difference"}], correct:"C", explanation:"Threads share the same address space (heap, global vars) within a process. Processes have separate memory spaces with IPC for communication.", difficulty:"Medium" },
+    { _id:"p6", question:"What is context switching?", options:[{label:"A",text:"Switching between programming languages"},{label:"B",text:"Saving and restoring CPU state to switch between processes"},{label:"C",text:"Changing network context"},{label:"D",text:"Switching disk sectors"}], correct:"B", explanation:"Context switch saves the state (registers, PC, stack) of the current process and restores the saved state of the next process to run.", difficulty:"Medium" },
+    { _id:"p7", question:"Which scheduling algorithm may cause starvation?", options:[{label:"A",text:"Round Robin"},{label:"B",text:"FCFS"},{label:"C",text:"Priority Scheduling"},{label:"D",text:"Multilevel Queue"}], correct:"C", explanation:"Priority Scheduling can starve low-priority processes if high-priority processes continuously arrive. Solution: aging (gradually increase priority).", difficulty:"Hard" },
+    { _id:"p8", question:"What is an orphan process?", options:[{label:"A",text:"A process with no children"},{label:"B",text:"A process whose parent has terminated"},{label:"C",text:"A process waiting for input"},{label:"D",text:"A newly created process"}], correct:"B", explanation:"An orphan process is one whose parent terminated before it. The OS re-parents it to init (PID 1) which will call wait().", difficulty:"Hard" },
+  ],
+  JavaScript: [
+    { _id:"j1", question:"What is the output of: typeof null?", options:[{label:"A",text:'"null"'},{label:"B",text:'"undefined"'},{label:"C",text:'"object"'},{label:"D",text:'"string"'}], correct:"C", explanation:"typeof null returns 'object' — this is a famous JavaScript bug that exists for historical reasons and cannot be fixed without breaking legacy code.", difficulty:"Easy" },
+    { _id:"j2", question:"What does the '===' operator check?", options:[{label:"A",text:"Value equality only"},{label:"B",text:"Reference equality"},{label:"C",text:"Value and type equality"},{label:"D",text:"Deep equality"}], correct:"C", explanation:"=== is strict equality — checks both value AND type without coercion. 1 === '1' is false. == coerces types: 1 == '1' is true.", difficulty:"Easy" },
+    { _id:"j3", question:"What is a closure in JavaScript?", options:[{label:"A",text:"A way to close a browser window"},{label:"B",text:"A function that remembers its outer scope variables"},{label:"C",text:"An error handling mechanism"},{label:"D",text:"A method to terminate a loop"}], correct:"B", explanation:"A closure is a function that retains access to its outer lexical scope even after the outer function has returned.", difficulty:"Medium" },
+    { _id:"j4", question:"Which of these creates a genuine copy (not reference) of an object?", options:[{label:"A",text:"let b = a"},{label:"B",text:"let b = Object.assign({}, a)"},{label:"C",text:"let b = JSON.parse(JSON.stringify(a))"},{label:"D",text:"let b = a.copy()"}], correct:"C", explanation:"JSON.parse(JSON.stringify(a)) creates a deep clone. Object.assign is shallow (nested objects still reference). Primitive: b=a copies value, objects: b=a copies reference.", difficulty:"Hard" },
+    { _id:"j5", question:"What is event bubbling?", options:[{label:"A",text:"Events propagating from child to parent elements"},{label:"B",text:"Events propagating from parent to child elements"},{label:"C",text:"Async event execution"},{label:"D",text:"DOM event creation"}], correct:"A", explanation:"Event bubbling: events propagate upward from target element to root. Click on a button → button handler → div handler → body handler.", difficulty:"Medium" },
+    { _id:"j6", question:"What does Promise.all() do?", options:[{label:"A",text:"Runs promises sequentially"},{label:"B",text:"Returns first resolved promise"},{label:"C",text:"Runs promises in parallel, resolves when all complete"},{label:"D",text:"Ignores rejected promises"}], correct:"C", explanation:"Promise.all() runs all promises concurrently and resolves with array of results when ALL resolve. If any rejects, it immediately rejects.", difficulty:"Medium" },
+    { _id:"j7", question:"What is the 'this' keyword in an arrow function?", options:[{label:"A",text:"Refers to the arrow function itself"},{label:"B",text:"Refers to the global object"},{label:"C",text:"Lexically inherited from surrounding scope"},{label:"D",text:"Undefined always"}], correct:"C", explanation:"Arrow functions don't have their own 'this'. They inherit 'this' from the enclosing lexical scope at the time of definition.", difficulty:"Hard" },
+    { _id:"j8", question:"What is the difference between let and var?", options:[{label:"A",text:"No difference"},{label:"B",text:"let is block-scoped, var is function-scoped"},{label:"C",text:"var is block-scoped, let is global"},{label:"D",text:"let cannot be reassigned"}], correct:"B", explanation:"var is function-scoped and hoisted. let is block-scoped ({}) and not accessible before declaration (temporal dead zone).", difficulty:"Medium" },
+  ],
+  Basics: [
+    { _id:"b1", question:"What is Python's GIL (Global Interpreter Lock)?", options:[{label:"A",text:"A security mechanism"},{label:"B",text:"A mutex preventing multiple threads from executing Python bytecode simultaneously"},{label:"C",text:"A garbage collector lock"},{label:"D",text:"A module import lock"}], correct:"B", explanation:"GIL is a mutex in CPython that allows only one thread to execute Python bytecode at a time, limiting true multi-threading for CPU-bound tasks.", difficulty:"Hard" },
+    { _id:"b2", question:"Which Python data type is immutable?", options:[{label:"A",text:"List"},{label:"B",text:"Dictionary"},{label:"C",text:"Set"},{label:"D",text:"Tuple"}], correct:"D", explanation:"Tuples are immutable — once created, their elements cannot be changed. Lists, dicts, and sets are mutable.", difficulty:"Easy" },
+    { _id:"b3", question:"What does list comprehension [x*2 for x in range(5)] produce?", options:[{label:"A",text:"[0,1,2,3,4]"},{label:"B",text:"[0,2,4,6,8]"},{label:"C",text:"[2,4,6,8,10]"},{label:"D",text:"[1,2,3,4,5]"}], correct:"B", explanation:"range(5) gives [0,1,2,3,4]. Multiplying each by 2: [0,2,4,6,8].", difficulty:"Easy" },
+    { _id:"b4", question:"What is the purpose of *args in a Python function?", options:[{label:"A",text:"Passes a dictionary of keyword arguments"},{label:"B",text:"Passes a variable number of positional arguments as a tuple"},{label:"C",text:"Unpacks a list"},{label:"D",text:"Declares a global variable"}], correct:"B", explanation:"*args collects extra positional arguments into a tuple, allowing a function to accept any number of positional arguments.", difficulty:"Medium" },
+    { _id:"b5", question:"What is a Python generator?", options:[{label:"A",text:"A function that returns a list"},{label:"B",text:"A function using yield to lazily produce values one at a time"},{label:"C",text:"A class that generates random numbers"},{label:"D",text:"An iterator class"}], correct:"B", explanation:"Generators use yield to produce values lazily. They pause execution after each yield, resuming on next(). Memory-efficient for large sequences.", difficulty:"Medium" },
+    { _id:"b6", question:"What does the walrus operator ':=' do in Python 3.8+?", options:[{label:"A",text:"Compares two values"},{label:"B",text:"Assigns a value and returns it in an expression"},{label:"C",text:"Creates a dictionary"},{label:"D",text:"Merges two dictionaries"}], correct:"B", explanation:"The walrus operator := (assignment expression) assigns a value and returns it simultaneously, useful in while loops and comprehensions.", difficulty:"Hard" },
+    { _id:"b7", question:"What is the difference between '==' and 'is' in Python?", options:[{label:"A",text:"No difference"},{label:"B",text:"== checks value equality, is checks identity (same object)"},{label:"C",text:"is checks value, == checks type"},{label:"D",text:"is is for numbers only"}], correct:"B", explanation:"== compares values (a==b). 'is' checks identity — whether both refer to the exact same object in memory (id(a)==id(b)).", difficulty:"Medium" },
+    { _id:"b8", question:"What is a Python decorator?", options:[{label:"A",text:"A CSS-like styling mechanism"},{label:"B",text:"A function that wraps another function to add behavior"},{label:"C",text:"A class inheritance pattern"},{label:"D",text:"A type annotation"}], correct:"B", explanation:"Decorators (@decorator_name) are functions that wrap other functions, adding behavior before/after without modifying the original function.", difficulty:"Medium" },
+  ],
+  MongoDB: [
+    { _id:"m1", question:"What type of database is MongoDB?", options:[{label:"A",text:"Relational Database"},{label:"B",text:"Document-Oriented NoSQL Database"},{label:"C",text:"Graph Database"},{label:"D",text:"Column-Store Database"}], correct:"B", explanation:"MongoDB is a document-oriented NoSQL database that stores data in flexible JSON-like BSON documents instead of rows and columns.", difficulty:"Easy" },
+    { _id:"m2", question:"What does BSON stand for in MongoDB?", options:[{label:"A",text:"Binary Standard Object Notation"},{label:"B",text:"Binary JavaScript Object Notation"},{label:"C",text:"Basic Serialized Object Notation"},{label:"D",text:"Binary Serialized Object Node"}], correct:"B", explanation:"BSON (Binary JSON) is the binary-encoded serialization format MongoDB uses to store documents. It extends JSON with additional data types like Date and ObjectId.", difficulty:"Medium" },
+    { _id:"m3", question:"Which MongoDB method retrieves documents matching a condition?", options:[{label:"A",text:"db.collection.get()"},{label:"B",text:"db.collection.find()"},{label:"C",text:"db.collection.select()"},{label:"D",text:"db.collection.fetch()"}], correct:"B", explanation:"find() retrieves all matching documents. findOne() retrieves the first match. Both accept query objects: db.users.find({age: {$gt: 18}})", difficulty:"Easy" },
+    { _id:"m4", question:"What is an index in MongoDB and why use it?", options:[{label:"A",text:"A backup copy of data"},{label:"B",text:"A special data structure that speeds up queries"},{label:"C",text:"A schema definition"},{label:"D",text:"A replica set member"}], correct:"B", explanation:"Indexes store a small portion of data in an easy-to-traverse form. Without indexes, MongoDB scans every document (collection scan). With indexes, queries are O(log n).", difficulty:"Medium" },
+    { _id:"m5", question:"What does the $lookup aggregation stage do?", options:[{label:"A",text:"Looks up a value in an array"},{label:"B",text:"Performs a LEFT JOIN with another collection"},{label:"C",text:"Searches text fields"},{label:"D",text:"Filters documents"}], correct:"B", explanation:"$lookup performs a left outer join between two collections in the same database, allowing you to combine data like SQL JOIN.", difficulty:"Hard" },
+    { _id:"m6", question:"What is a MongoDB replica set?", options:[{label:"A",text:"A backup file"},{label:"B",text:"A group of mongod instances maintaining the same data for high availability"},{label:"C",text:"Multiple databases"},{label:"D",text:"A sharding configuration"}], correct:"B", explanation:"A replica set is a group of mongod processes that maintain the same dataset. It provides redundancy and high availability with automatic failover.", difficulty:"Hard" },
+    { _id:"m7", question:"Which operator finds documents where a field value is in an array?", options:[{label:"A",text:"$contains"},{label:"B",text:"$in"},{label:"C",text:"$within"},{label:"D",text:"$includes"}], correct:"B", explanation:"$in selects documents where field value matches any value in specified array: {status: {$in: ['active', 'pending']}}.", difficulty:"Medium" },
+    { _id:"m8", question:"What is mongoose in Node.js?", options:[{label:"A",text:"A MongoDB client"},{label:"B",text:"An ODM (Object Document Mapper) for MongoDB with schema validation"},{label:"C",text:"A database GUI tool"},{label:"D",text:"A test framework"}], correct:"B", explanation:"Mongoose is an ODM library for MongoDB and Node.js. It provides schema-based modeling, validation, query building, and business logic hooks.", difficulty:"Medium" },
+  ],
+};
 
-function ProgressRing({ progress, size=54, stroke=5, color }) {
-  const r = (size - stroke * 2) / 2;
-  const circ = 2 * Math.PI * r;
-  const dash = (progress / 100) * circ;
-  const cx = size / 2;
-  return (
-    <div style={{ position: "relative", width: size, height: size, display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }}>
-        <circle cx={cx} cy={cx} r={r} fill="none" stroke="#e8eaed" strokeWidth={stroke} />
-        <circle cx={cx} cy={cx} r={r} fill="none" stroke={color} strokeWidth={stroke}
-          strokeDasharray={`${dash} ${circ}`} strokeLinecap="round"
-          style={{ transition: "stroke-dasharray 0.7s ease" }} />
-      </svg>
-      <span style={{ position: "absolute", fontSize: 11, fontWeight: 800, color, fontFamily: "inherit" }}>{progress}%</span>
-    </div>
-  );
+// fallback for topics without specific questions
+function getDefaultQuestions(topic) {
+  return Array.from({ length: 8 }, (_, i) => ({
+    _id: `${topic}_${i}`,
+    question: `[${topic}] Question ${i+1}: What is the key concept behind ${topic} and how does it apply in real-world scenarios?`,
+    options: [
+      { label:"A", text:`Correct answer: The fundamental principle of ${topic}` },
+      { label:"B", text:"Incorrect: A commonly confused alternative approach" },
+      { label:"C", text:"Incorrect: A plausible but wrong implementation detail" },
+      { label:"D", text:"Incorrect: An edge case that doesn't apply here" },
+    ],
+    correct:"A",
+    explanation:`In ${topic}, option A is correct because it accurately represents the core concept. Understanding this is essential for interviews.`,
+    difficulty: ["Easy","Medium","Hard"][i%3],
+  }));
 }
 
-function BarStrip({ value, color }) {
-  return (
-    <div style={{ background: "#e8eaed", borderRadius: 99, height: 6, overflow: "hidden", width: "100%" }}>
-      <div style={{ width: `${value}%`, height: "100%", background: color, borderRadius: 99, transition: "width 0.6s ease" }} />
-    </div>
-  );
+function getMockQuestions(topic) {
+  return MOCK_QUESTIONS[topic] || getDefaultQuestions(topic);
 }
 
-function DiffBadge({ difficulty, color, bg }) {
+// ────────────────────────────────────────────────────────────────────
+// API LAYER  (falls back to mock on any error)
+// ────────────────────────────────────────────────────────────────────
+async function apiFetchQuestions(subjectCode, topic, limit=10) {
+  try {
+    const params = new URLSearchParams({ topic, limit });
+    const res = await fetch(`${API_BASE}/subjects/${subjectCode}/questions?${params}`, { signal: AbortSignal.timeout(4000) });
+    if (!res.ok) throw new Error("API error");
+    const data = await res.json();
+    return (data.questions || data).slice(0, limit);
+  } catch {
+    return getMockQuestions(topic).slice(0, limit);
+  }
+}
+
+async function apiSubmitAnswer(subjectCode, questionId, selectedOption, isCorrect) {
+  try {
+    await fetch(`${API_BASE}/progress/submit`, {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({ subjectCode, questionId, selectedOption, isCorrect }),
+      signal: AbortSignal.timeout(3000),
+    });
+  } catch { /* silent — we still track locally */ }
+}
+
+// ────────────────────────────────────────────────────────────────────
+// LOCAL PROGRESS STORAGE  (works without backend)
+// ────────────────────────────────────────────────────────────────────
+const localProgress = {};   // { DSA: { Arrays: { correct:3, total:8 } } }
+
+function recordLocalProgress(code, topic, isCorrect) {
+  if (!localProgress[code]) localProgress[code] = {};
+  if (!localProgress[code][topic]) localProgress[code][topic] = { correct:0, total:0 };
+  localProgress[code][topic].total++;
+  if (isCorrect) localProgress[code][topic].correct++;
+}
+
+// ────────────────────────────────────────────────────────────────────
+// SMALL REUSABLE COMPONENTS
+// ────────────────────────────────────────────────────────────────────
+
+function DiffBadge({ difficulty }) {
+  const cfg = { Easy:["#16a34a","#f0fdf4"], Medium:["#d97706","#fffbeb"], Hard:["#dc2626","#fff5f5"] };
+  const [clr, bg] = cfg[difficulty] || ["#888","#f3f4f6"];
+  return <span style={{fontSize:12,fontWeight:700,color:clr,background:bg,padding:"3px 9px",borderRadius:20}}>{difficulty}</span>;
+}
+
+function TagPill({ tag, color }) {
   return (
-    <span style={{ background: bg, color, fontSize: 11, fontWeight: 700, padding: "3px 9px", borderRadius: 99, border: `1px solid ${color}40`, whiteSpace: "nowrap" }}>
-      {difficulty}
+    <span style={{fontSize:11,fontWeight:700,color:color,background:color+"18",border:`1px solid ${color}30`,padding:"2px 9px",borderRadius:20}}>
+      + {tag}
     </span>
   );
 }
 
-function TagBadge({ tag, color, bg }) {
+function ProgressBar({ pct, color, height=6 }) {
   return (
-    <span style={{ background: bg, color, fontSize: 11, fontWeight: 700, padding: "3px 9px", borderRadius: 99, border: `1px solid ${color}40`, whiteSpace: "nowrap" }}>
-      ✦ {tag}
-    </span>
+    <div style={{background:"#e5e7eb",borderRadius:999,height,overflow:"hidden"}}>
+      <div style={{width:`${Math.min(pct,100)}%`,background:color,height:"100%",borderRadius:999,transition:"width .5s ease"}} />
+    </div>
   );
 }
 
-function SubjectCard({ subject, onSelect, view }) {
-  const [hovered, setHovered] = useState(false);
+function CircleRing({ pct, color, size=54 }) {
+  const r=(size-8)/2, circ=2*Math.PI*r, dash=(pct/100)*circ;
+  return (
+    <svg width={size} height={size} style={{transform:"rotate(-90deg)",flexShrink:0}}>
+      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#e5e7eb" strokeWidth={5}/>
+      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={5}
+        strokeDasharray={`${dash} ${circ}`} strokeLinecap="round"
+        style={{transition:"stroke-dasharray .6s ease"}}/>
+      <text x={size/2} y={size/2} textAnchor="middle" dominantBaseline="central"
+        fill={color} fontSize={11} fontWeight={700}
+        style={{transform:`rotate(90deg)`,transformOrigin:`${size/2}px ${size/2}px`}}>
+        {pct}%
+      </text>
+    </svg>
+  );
+}
 
-  const cardStyle = {
-    background: "#fff",
-    borderRadius: 18,
-    padding: view === "grid" ? 22 : "16px 24px",
-    cursor: "pointer",
-    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-    display: "flex",
-    flexDirection: view === "grid" ? "column" : "row",
-    gap: view === "grid" ? 14 : 24,
-    alignItems: view === "grid" ? "stretch" : "center",
-    position: "relative",
-    border: hovered ? `2.5px solid ${subject.borderColor}` : "1.5px solid #e8eaed",
-    transform: hovered ? "translateY(-4px)" : "none",
-    boxShadow: hovered ? `0 8px 28px ${subject.borderColor}22` : "none",
+function Spinner({ color="#2563eb" }) {
+  return <div className="spin" style={{width:36,height:36,border:`4px solid ${color}30`,borderTop:`4px solid ${color}`,borderRadius:"50%"}} />;
+}
+
+// ────────────────────────────────────────────────────────────────────
+// NAVBAR
+// ────────────────────────────────────────────────────────────────────
+function Navbar({ view, onNavigate, onLogout }) {
+  const navigate = useNavigate();
+  const links = ["Home","Dashboard","Subjects","Progress","Interview Rounds","Test"];
+  
+  const handleNav = (n) => {
+    if (n === "Subjects") onNavigate("subjects");
+    else navigate(n === "Home" ? "/" : `/${n.toLowerCase().replace(' ', '-')}`);
   };
 
-  const gridLayout = (
-    <>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-        <div style={{ display: "flex", gap: 14 }}>
-          <div style={{ width: 50, height: 50, background: subject.color, borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 }}>
-            {subject.icon}
-          </div>
-          <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: 16, fontWeight: 800, color: "#1a1a2e", lineHeight: 1.3, marginBottom: 2 }}>{subject.name}</div>
-            <div style={{ fontSize: 12, color: "#9aa0a6", fontWeight: 600 }}>{subject.short}</div>
-          </div>
-        </div>
-        <ProgressRing progress={subject.progress} color={subject.iconColor} />
-      </div>
-
-      <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-        <TagBadge tag={subject.tag} color={subject.tagColor} bg={subject.tagBg} />
-        <DiffBadge difficulty={subject.difficulty} color={subject.diffColor} bg={subject.diffBg} />
-      </div>
-
-      <div style={{ marginTop: 4 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: 12, color: "#5f6368", fontWeight: 600 }}>
-          <span>{subject.doneTopics}/{subject.totalTopics} topics done</span>
-          <span style={{ color: subject.iconColor }}>{subject.progress}%</span>
-        </div>
-        <BarStrip value={subject.progress} color={subject.iconColor} />
-      </div>
-
-      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 4 }}>
-        {subject.topics.slice(0, 4).map((t, idx) => (
-          <span key={idx} style={{ background: subject.color, color: subject.iconColor, fontSize: 11, fontWeight: 700, padding: "5px 10px", borderRadius: 8 }}>
-            {t}
-          </span>
-        ))}
-        {subject.topics.length > 4 && (
-          <span style={{ background: "#f1f3f4", color: "#5f6368", fontSize: 11, fontWeight: 700, padding: "5px 10px", borderRadius: 8 }}>
-            +{subject.topics.length - 4} more
-          </span>
-        )}
-      </div>
-
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 14, borderTop: "1px solid #f1f3f4", marginTop: 4 }}>
-        <span style={{ fontSize: 13, color: "#5f6368", fontWeight: 600 }}>📝 {subject.questionsCount} questions</span>
-        <button style={{ background: subject.color, color: subject.iconColor, border: "none", borderRadius: 10, padding: "9px 18px", fontWeight: 800, fontSize: 13, cursor: "pointer", transition: "0.2s" }}>
-          {subject.progress > 0 ? "Continue →" : "Start →"}
-        </button>
-      </div>
-    </>
-  );
-
-  const listLayout = (
-    <>
-      <div style={{ width: 50, height: 50, background: subject.color, borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 }}>
-        {subject.icon}
-      </div>
-      <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 16, fontWeight: 800, color: "#1a1a2e" }}>{subject.name} ({subject.short})</div>
-        <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
-          <TagBadge tag={subject.tag} color={subject.tagColor} bg={subject.tagBg} />
-          <DiffBadge difficulty={subject.difficulty} color={subject.diffColor} bg={subject.diffBg} />
-          <span style={{ fontSize: 12, color: "#5f6368", fontWeight: 600 }}>📝 {subject.questionsCount} Qs</span>
-        </div>
-      </div>
-      <div style={{ width: 180 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: 12, fontWeight: 700 }}>
-          <span style={{ color: "#5f6368" }}>{subject.progress}%</span>
-          <span style={{ color: subject.iconColor }}>{subject.doneTopics}/{subject.totalTopics} topics</span>
-        </div>
-        <BarStrip value={subject.progress} color={subject.iconColor} />
-      </div>
-      <div style={{ marginLeft: 20 }}>
-        <ProgressRing progress={subject.progress} color={subject.iconColor} size={48} />
-      </div>
-      <button style={{ background: subject.color, color: subject.iconColor, border: "none", borderRadius: 10, padding: "10px 20px", fontWeight: 800, fontSize: 13, cursor: "pointer", marginLeft: 20 }}>
-        {subject.progress > 0 ? "Continue" : "Start"}
-      </button>
-    </>
-  );
-
   return (
-    <div 
-      onMouseEnter={() => setHovered(true)} 
-      onMouseLeave={() => setHovered(false)} 
-      onClick={() => onSelect(subject)}
-      style={cardStyle}
-    >
-      {view === "grid" ? gridLayout : listLayout}
-    </div>
+    <nav style={{background:"#fff",borderBottom:"1px solid #e5e7eb",padding:"0 28px",display:"flex",alignItems:"center",justifyContent:"space-between",height:60,position:"sticky",top:0,zIndex:200,boxShadow:"0 1px 4px rgba(0,0,0,.06)"}}>
+      <div style={{display:"flex",alignItems:"center",gap:10, cursor: "pointer"}} onClick={() => navigate("/")}>
+          <img src="/logo.png" alt="Logo" style={{ width: 44, height: 44, objectFit: "cover", borderRadius: "50%", boxShadow: "0 4px 12px rgba(0,0,0,0.12)", transition: "all 0.3s ease" }} 
+            onMouseEnter={e => e.currentTarget.style.transform = "scale(1.1)"}
+            onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
+          />
+        <span style={{fontWeight:900,fontSize:19,color:"#111",letterSpacing:-.3}}>InterviewAce</span>
+      </div>
+      <div className="navbar-links" style={{display:"flex",gap:6}}>
+        {links.map(n=>(
+          <button key={n} onClick={()=>handleNav(n)}
+            style={{background:"none",border:"none",fontSize:14,color:(n==="Subjects" && view!=="dashboard")?"#2563eb":"#555",fontWeight:(n==="Subjects" && view!=="dashboard")?700:500,cursor:"pointer",padding:"6px 12px",borderRadius:8,borderBottom:(n==="Subjects" && view!=="dashboard")?"2px solid #2563eb":"2px solid transparent",transition:"all .15s"}}
+            onMouseOver={e=>{if(n!=="Subjects")e.currentTarget.style.background="#f3f4f6"}}
+            onMouseOut={e=>e.currentTarget.style.background="none"}
+          >{n}</button>
+        ))}
+      </div>
+      <button onClick={onLogout} style={{background:"#2563eb",color:"#fff",border:"none",padding:"8px 22px",borderRadius:9,fontWeight:700,fontSize:14}}>Logout</button>
+    </nav>
   );
 }
 
-function SubjectModal({ subject, onClose }) {
+// ────────────────────────────────────────────────────────────────────
+// SUBJECT CARD (modal popup on click)
+// ────────────────────────────────────────────────────────────────────
+function SubjectModal({ subject, onClose, onContinue }) {
   return (
-    <div 
-      onClick={onClose}
-      style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 20 }}
-    >
-      <div 
-        onClick={(e) => e.stopPropagation()}
-        style={{ background: "#fff", borderRadius: 24, padding: 36, maxWidth: 520, width: "100%", position: "relative", boxShadow: "0 20px 40px rgba(0,0,0,0.2)", animation: "modalSlide 0.3s ease-out" }}
-      >
-        <button 
-          onClick={onClose}
-          style={{ position: "absolute", top: 20, right: 20, width: 36, height: 36, borderRadius: "50%", background: "#f1f3f4", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, color: "#5f6368", fontWeight: 800 }}
-        >✕</button>
+    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.5)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:20}} onClick={onClose}>
+      <div className="slide-up" style={{background:"#fff",borderRadius:24,padding:"34px 30px",maxWidth:490,width:"100%",position:"relative",boxShadow:"0 24px 64px rgba(0,0,0,.18)"}} onClick={e=>e.stopPropagation()}>
+        <button onClick={onClose} style={{position:"absolute",top:16,right:16,width:32,height:32,borderRadius:"50%",border:"1px solid #e5e7eb",background:"#f9fafb",cursor:"pointer",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center",color:"#555"}}>✕</button>
 
-        <div style={{ display: "flex", gap: 18, alignItems: "center", marginBottom: 30 }}>
-          <div style={{ width: 64, height: 64, background: subject.color, borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32 }}>{subject.icon}</div>
+        {/* Header */}
+        <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:28}}>
+          <div style={{width:66,height:66,borderRadius:18,background:subject.bg,display:"flex",alignItems:"center",justifyContent:"center",fontSize:30,border:`1.5px solid ${subject.color}20`}}>
+            {subject.emoji}
+          </div>
           <div>
-            <h2 style={{ fontSize: 24, fontWeight: 800, margin: 0, color: "#1a1a2e" }}>{subject.name}</h2>
-            <div style={{ color: "#5f6368", fontSize: 14, fontWeight: 600, marginTop: 4 }}>{subject.short} • {subject.questionsCount} Interview Questions</div>
+            <h2 style={{margin:"0 0 4px",fontSize:21,fontWeight:800,color:"#111"}}>{subject.name}</h2>
+            <p style={{margin:0,color:"#888",fontSize:13}}>{subject.code} · {subject.questions} Interview Questions</p>
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginBottom: 30 }}>
+        {/* Stats */}
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12,marginBottom:22}}>
           {[
-            { label: "Progress", val: `${subject.progress}%`, color: subject.iconColor },
-            { label: "Topics", val: `${subject.doneTopics}/${subject.totalTopics}`, color: "#1a1a2e" },
-            { label: "Difficulty", val: subject.difficulty, color: subject.diffColor }
-          ].map((stat, i) => (
-            <div key={i} style={{ background: "#f8f9fa", padding: "16px 8px", borderRadius: 16, textAlign: "center", border: "1px solid #f1f3f4" }}>
-              <div style={{ fontSize: 12, color: "#9aa0a6", fontWeight: 700, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>{stat.label}</div>
-              <div style={{ fontSize: 18, fontWeight: 800, color: stat.color }}>{stat.val}</div>
+            {label:"PROGRESS", value:`${subject.progress}%`, color:subject.color},
+            {label:"TOPICS",   value:`${subject.done}/${subject.topics}`, color:"#111"},
+            {label:"DIFFICULTY",value:subject.difficulty, color:subject.difficulty==="Hard"?"#dc2626":subject.difficulty==="Medium"?"#d97706":"#16a34a"},
+          ].map(c=>(
+            <div key={c.label} style={{background:"#f8f9fa",borderRadius:14,padding:"14px 10px",textAlign:"center"}}>
+              <div style={{fontSize:10,color:"#888",fontWeight:700,letterSpacing:.8,marginBottom:6}}>{c.label}</div>
+              <div style={{fontSize:20,fontWeight:800,color:c.color}}>{c.value}</div>
             </div>
           ))}
         </div>
 
-        <div style={{ marginBottom: 30 }}>
-          <div style={{ fontSize: 14, fontWeight: 800, color: "#1a1a2e", marginBottom: 12, display: "flex", alignItems: "center", gap: 8 }}>
-            <span>📚 Curriculum Topics</span>
-            <span style={{ fontSize: 11, background: "#f1f3f4", padding: "2px 8px", borderRadius: 6, color: "#5f6368" }}>{subject.topics.length} Total</span>
+        {/* Topics chips */}
+        <div style={{marginBottom:22}}>
+          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
+            <span style={{fontSize:14,fontWeight:700}}>📊 Curriculum Topics</span>
+            <span style={{background:"#f3f4f6",borderRadius:20,padding:"2px 10px",fontSize:12,color:"#555",fontWeight:600}}>{subject.topics_list.length} Total</span>
           </div>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            {subject.topics.map((t, i) => (
-              <span key={i} style={{ background: subject.color, color: subject.iconColor, fontSize: 12, fontWeight: 700, padding: "6px 12px", borderRadius: 10 }}>{t}</span>
+          <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+            {subject.topics_list.map(t=>(
+              <span key={t.name} style={{background:subject.color+"14",color:subject.color,padding:"5px 13px",borderRadius:20,fontSize:13,fontWeight:600,border:`1px solid ${subject.color}28`}}>
+                {t.name} {t.done ? "✓" : ""}
+              </span>
             ))}
           </div>
         </div>
 
-        <div style={{ marginBottom: 30 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 13, fontWeight: 700 }}>
-            <span style={{ color: "#5f6368" }}>Current Completion</span>
-            <span style={{ color: subject.iconColor }}>{subject.progress}%</span>
+        {/* Progress bar */}
+        <div style={{marginBottom:26}}>
+          <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
+            <span style={{fontSize:14,color:"#555"}}>Current Completion</span>
+            <span style={{fontSize:14,color:subject.color,fontWeight:700}}>{subject.progress}%</span>
           </div>
-          <BarStrip value={subject.progress} color={subject.iconColor} />
+          <ProgressBar pct={subject.progress} color={subject.color} height={8}/>
         </div>
 
-        <button style={{ width: "100%", background: subject.iconColor, color: "#fff", border: "none", borderRadius: 16, padding: 16, fontSize: 16, fontWeight: 800, cursor: "pointer", boxShadow: `0 8px 20px ${subject.iconColor}40`, transition: "0.2s" }}>
-          {subject.progress > 0 ? "Continue Preparation" : "Start Learning Path"}
+        <button onClick={()=>onContinue(subject)}
+          style={{width:"100%",padding:"17px",background:subject.color,color:"#fff",border:"none",borderRadius:14,fontSize:16,fontWeight:800,cursor:"pointer",letterSpacing:.2,transition:"opacity .2s"}}
+          onMouseOver={e=>e.target.style.opacity=.88} onMouseOut={e=>e.target.style.opacity=1}>
+          Continue Preparation →
         </button>
       </div>
-      <style>{`
-        @keyframes modalSlide {
-          from { transform: translateY(30px); opacity: 0; }
-          to { transform: translateY(0); opacity: 1; }
-        }
-      `}</style>
     </div>
   );
 }
 
-// ─── MAIN PAGE ────────────────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────────
+// SUBJECT ROW  (list item on subjects page)
+// ────────────────────────────────────────────────────────────────────
+function SubjectRow({ subject, onClick }) {
+  const [hover, setHover] = useState(false);
+  return (
+    <div className="row-hover subject-row"
+      onClick={()=>onClick(subject)}
+      onMouseOver={()=>setHover(true)} onMouseOut={()=>setHover(false)}
+      style={{display:"flex",alignItems:"center",gap:16,padding:"18px 20px",background:hover?subject.color+"08":"#fff",borderRadius:15,border:`1.5px solid ${hover?subject.color+"60":"#e5e7eb"}`,cursor:"pointer",marginBottom:10,boxShadow:hover?"0 4px 18px rgba(0,0,0,.07)":"none",transition:"all .2s"}}>
 
-export default function SubjectsPage() {
-  const navigate = useNavigate();
+      {/* Icon */}
+      <div style={{width:46,height:46,borderRadius:13,background:subject.bg,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0,border:`1px solid ${subject.color}20`}}>
+        {subject.emoji}
+      </div>
+
+      {/* Info */}
+      <div style={{flex:1,minWidth:0}}>
+        <div style={{fontSize:15,fontWeight:700,color:"#111",marginBottom:5}}>
+          {subject.name} <span style={{color:"#aaa",fontWeight:400,fontSize:13}}>({subject.code})</span>
+        </div>
+        <div style={{display:"flex",gap:6,flexWrap:"wrap",alignItems:"center"}}>
+          {subject.tags.map(t=><TagPill key={t} tag={t} color={subject.color}/>)}
+          <DiffBadge difficulty={subject.difficulty}/>
+          <span style={{fontSize:11,color:"#888"}}>📋 {subject.questions} Qs</span>
+        </div>
+      </div>
+
+      {/* Progress */}
+      <div className="subject-row-progress" style={{display:"flex",alignItems:"center",gap:14,flexShrink:0}}>
+        <div style={{width:120}}>
+          <div style={{display:"flex",justifyContent:"space-between",marginBottom:5}}>
+            <span style={{fontSize:13,fontWeight:700,color:subject.color}}>{subject.progress}%</span>
+            <span style={{fontSize:12,color:"#888"}}>{subject.done}/{subject.topics} topics</span>
+          </div>
+          <ProgressBar pct={subject.progress} color={subject.color}/>
+        </div>
+        <CircleRing pct={subject.progress} color={subject.color}/>
+        <button style={{padding:"9px 18px",background:"#fff",border:`1.5px solid ${subject.color}`,color:subject.color,borderRadius:10,fontSize:13,fontWeight:700,transition:"all .2s",whiteSpace:"nowrap"}}
+          onMouseOver={e=>{e.currentTarget.style.background=subject.color;e.currentTarget.style.color="#fff"}}
+          onMouseOut={e=>{e.currentTarget.style.background="#fff";e.currentTarget.style.color=subject.color}}>
+          Continue
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ────────────────────────────────────────────────────────────────────
+// SUBJECTS PAGE
+// ────────────────────────────────────────────────────────────────────
+function SubjectsPageContent({ onSelectSubject }) {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
-  const [sort, setSort] = useState("Default");
-  const [selected, setSelected] = useState(null);
-  const [view, setView] = useState("grid");
+  const [modal, setModal] = useState(null);
 
-  // Stats
-  const started = allSubjects.filter(s => s.progress > 0).length;
-  const completed = allSubjects.filter(s => s.progress === 100).length;
-  const overallProgress = Math.round(allSubjects.reduce((acc, s) => acc + s.progress, 0) / allSubjects.length);
+  const all = [...SUBJECTS.core, ...SUBJECTS.specialization];
+  const avgProgress = Math.round(all.reduce((a,s)=>a+s.progress,0)/all.length);
 
-  const applyFilters = (list) => {
-    let out = [...list];
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      out = out.filter(s => 
-        s.name.toLowerCase().includes(q) || 
-        s.short.toLowerCase().includes(q) || 
-        s.topics.some(t => t.toLowerCase().includes(q))
-      );
-    }
-    if (filter !== "All") out = out.filter(s => s.difficulty === filter);
-    
-    if (sort === "Progress: High") out.sort((a, b) => b.progress - a.progress);
-    else if (sort === "Progress: Low") out.sort((a, b) => a.progress - b.progress);
-    else if (sort === "Name A-Z") out.sort((a, b) => a.name.localeCompare(b.name));
-    
-    return out;
-  };
-
-  const filteredCore = applyFilters(coreSubjects);
-  const filteredSpecial = applyFilters(specialSubjects);
-  const totalFiltered = filteredCore.length + filteredSpecial.length;
+  const filtered = list => list.filter(s => {
+    const ms = filter==="All" || s.difficulty===filter;
+    const mq = !search || s.name.toLowerCase().includes(search.toLowerCase()) || s.topics_list.some(t=>t.name.toLowerCase().includes(search.toLowerCase()));
+    return ms && mq;
+  });
 
   return (
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-// ...existing code from the latest version...
-// (Paste the complete, latest, and correct implementation here, as per your requirements)
-// ...existing code...
-        <div style={{ display: "flex", gap: 32, height: "100%" }}>
-          {["Home", "Dashboard", "Subjects", "Progress", "Interview Rounds", "Test"].map(n => (
-            <div key={n} 
-              onMouseEnter={() => setHoveredNav(n)}
-              onMouseLeave={() => setHoveredNav(null)}
-              onClick={() => navigate(n === "Home" ? "/" : `/${n.toLowerCase().replace(' ', '-')}`)}
-              style={{ display: "flex", alignItems: "center", height: "100%", padding: "0 4px", fontSize: 14, fontWeight: (n === "Subjects") ? 700 : 500, color: (n === "Subjects" || hoveredNav === n) ? "#1a73e8" : "#5f6368", borderBottom: (n === "Subjects") ? "2px solid #1a73e8" : "2px solid transparent", cursor: "pointer", transition: "0.2s" }}
-            >
-              {n}
-            </div>
+    <div className="fade-in" style={{maxWidth:1100,margin:"0 auto",padding:"32px 24px"}}>
+      {/* Title */}
+      <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:6}}>
+        <span style={{fontSize:30}}>📚</span>
+        <h1 style={{fontSize:28,fontWeight:900,letterSpacing:-.4}}>Engineering Subjects</h1>
+      </div>
+      <p style={{color:"#888",marginBottom:28,fontSize:15}}>Master interviews across all core and specialization disciplines</p>
+
+      {/* Stat cards */}
+      <div className="stats-grid" style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:14,marginBottom:28}}>
+        {[
+          {icon:"📖",val:all.length,   label:"Total Subjects", color:"#2563eb"},
+          {icon:"⏳",val:all.length,   label:"In Progress",    color:"#7c3aed"},
+          {icon:"✅",val:0,            label:"Completed",      color:"#16a34a"},
+          {icon:"📈",val:`${avgProgress}%`,label:"Avg Progress",color:"#d97706"},
+        ].map(s=>(
+          <div key={s.label} style={{background:"#fff",borderRadius:16,padding:"20px 18px",border:"1px solid #e5e7eb",boxShadow:"0 1px 4px rgba(0,0,0,.05)"}}>
+            <div style={{fontSize:24,marginBottom:10}}>{s.icon}</div>
+            <div style={{fontSize:28,fontWeight:900,color:s.color}}>{s.val}</div>
+            <div style={{fontSize:13,color:"#888",marginTop:2}}>{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Filter bar */}
+      <div style={{display:"flex",gap:12,alignItems:"center",marginBottom:28,background:"#fff",padding:"14px 18px",borderRadius:14,border:"1px solid #e5e7eb",flexWrap:"wrap"}}>
+        <div style={{flex:1,minWidth:250,display:"flex",alignItems:"center",gap:8,background:"#f8f9fa",borderRadius:10,padding:"9px 14px"}}>
+          <span style={{color:"#aaa",fontSize:15}}>🔍</span>
+          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search subjects or topics..."
+            style={{border:"none",background:"none",outline:"none",fontSize:14,flex:1,color:"#111"}}/>
+          {search && <button onClick={()=>setSearch("")} style={{border:"none",background:"none",color:"#aaa",cursor:"pointer",fontSize:16}}>✕</button>}
+        </div>
+        <div style={{display:"flex", gap: 8}}>
+          {["All","Easy","Medium","Hard"].map(f=>(
+            <button key={f} onClick={()=>setFilter(f)}
+              style={{padding:"9px 20px",borderRadius:10,border:"none",fontSize:13,fontWeight:700,cursor:"pointer",background:filter===f?"#2563eb":"#f3f4f6",color:filter===f?"#fff":"#555",transition:"all .2s"}}>
+              {f}
+            </button>
           ))}
         </div>
-        <button onClick={handleLogout} style={{ background: "#1a73e8", color: "#fff", border: "none", borderRadius: 9, padding: "8px 22px", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>Logout</button>
-      </nav>
-=======
-    <div style={{ background: "var(--bg-page)", minHeight: "100vh", fontFamily: "'Sora', sans-serif", color: "var(--text-main)" }}>
->>>>>>> Stashed changes
+        <span style={{fontSize:13,color:"#aaa",whiteSpace:"nowrap", marginLeft:"auto"}}>{all.length} subjects</span>
+      </div>
 
-      <div style={{ maxWidth: 1150, margin: "0 auto", padding: "36px 20px 80px" }}>
-        
-        {/* Header */}
-        <div style={{ marginBottom: 32 }}>
-          <h1 style={{ fontSize: 32, fontWeight: 800, color: "#1a1a2e", margin: "0 0 8px 0" }}>📚 Engineering Subjects</h1>
-          <p style={{ color: "#5f6368", fontSize: 16, fontWeight: 500 }}>Master interviews across all core and specialization disciplines</p>
+      {/* Core subjects */}
+      <section style={{marginBottom:32}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}>
+          <div style={{width:4,height:22,background:"#2563eb",borderRadius:2}}/>
+          <h2 style={{fontSize:19,fontWeight:800}}>Core Engineering Subjects</h2>
+          <span style={{background:"#eff6ff",color:"#2563eb",padding:"3px 12px",borderRadius:20,fontSize:13,fontWeight:700}}>{SUBJECTS.core.length}</span>
         </div>
+        {filtered(SUBJECTS.core).length===0
+          ? <div style={{textAlign:"center",padding:"40px",color:"#aaa",background:"#fff",borderRadius:14,border:"1px dashed #e5e7eb"}}>No subjects match your filter</div>
+          : filtered(SUBJECTS.core).map(s=><SubjectRow key={s.id} subject={s} onClick={setModal}/>)}
+      </section>
 
-        {/* Stats Row */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 16, marginBottom: 32 }}>
-          {[
-            { label: "Total Subjects", val: allSubjects.length, color: "#1a73e8", bg: "#e8f0fe", icon: "📖" },
-            { label: "In Progress", val: started, color: "#9334ea", bg: "#f3e8fd", icon: "⏳" },
-            { label: "Completed", val: completed, color: "#1e8e3e", bg: "#e6f4ea", icon: "✅" },
-            { label: "Avg Progress", val: `${overallProgress}%`, color: "#e37400", bg: "#fff3e0", icon: "📈" }
-          ].map((s, i) => (
-            <div key={i} style={{ background: "#fff", borderRadius: 16, padding: 20, border: "1px solid #e8eaed", display: "flex", flexDirection: "column", gap: 10 }}>
-              <div style={{ width: 38, height: 38, borderRadius: 10, background: s.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{s.icon}</div>
-              <div>
-                <div style={{ fontSize: 24, fontWeight: 800, color: s.color }}>{s.val}</div>
-                <div style={{ fontSize: 12, color: "#9aa0a6", fontWeight: 700, marginTop: 2 }}>{s.label}</div>
-              </div>
-            </div>
-          ))}
+      {/* Specialization subjects */}
+      <section style={{marginBottom:40}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}>
+          <div style={{width:4,height:22,background:"#16a34a",borderRadius:2}}/>
+          <h2 style={{fontSize:19,fontWeight:800}}>Specialization & Programming</h2>
+          <span style={{background:"#f0fdf4",color:"#16a34a",padding:"3px 12px",borderRadius:20,fontSize:13,fontWeight:700}}>{SUBJECTS.specialization.length}</span>
         </div>
+        {filtered(SUBJECTS.specialization).length===0
+          ? <div style={{textAlign:"center",padding:"40px",color:"#aaa",background:"#fff",borderRadius:14,border:"1px dashed #e5e7eb"}}>No subjects match your filter</div>
+          : filtered(SUBJECTS.specialization).map(s=><SubjectRow key={s.id} subject={s} onClick={setModal}/>)}
+      </section>
 
-        {/* Filters Bar */}
-        <div style={{ background: "#fff", borderRadius: 18, padding: "16px 20px", border: "1px solid #e8eaed", display: "flex", flexWrap: "wrap", gap: 14, alignItems: "center", marginBottom: 32 }}>
-          <div style={{ flex: 1, minWidth: 240, position: "relative" }}>
-            <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 16 }}>🔍</span>
-            <input 
-              type="text" 
-              placeholder="Search subjects or topics..." 
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              style={{ width: "100%", padding: "12px 14px 12px 42px", border: "1.5px solid #e8eaed", borderRadius: 12, fontSize: 14, outline: "none", boxSizing: "border-box", fontFamily: "inherit" }}
-            />
-          </div>
-
-          <div style={{ display: "flex", background: "#f8f9fa", padding: 4, borderRadius: 12, border: "1px solid #e8eaed" }}>
-            {FILTERS.map(f => (
-              <button 
-                key={f} 
-                onClick={() => setFilter(f)}
-                style={{ padding: "8px 16px", borderRadius: 9, border: "none", fontSize: 13, fontWeight: 700, cursor: "pointer", background: filter === f ? "#1a73e8" : "transparent", color: filter === f ? "#fff" : "#5f6368", transition: "0.2s" }}
-              >
-                {f}
-              </button>
-            ))}
-          </div>
-
-          <select 
-            value={sort} 
-            onChange={(e) => setSort(e.target.value)}
-            style={{ padding: "11px 14px", borderRadius: 12, border: "1.5px solid #e8eaed", fontSize: 14, fontWeight: 600, background: "#fff", outline: "none", cursor: "pointer", color: "#3c4043" }}
-          >
-            {SORT_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
-          </select>
-
-          <div style={{ display: "flex", background: "#f1f3f4", padding: 3, borderRadius: 10, gap: 2 }}>
-            <button 
-              onClick={() => setView("grid")}
-              style={{ width: 34, height: 34, borderRadius: 8, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, background: view === "grid" ? "#1a73e8" : "transparent", color: view === "grid" ? "#fff" : "#5f6368" }}
-            >⊞</button>
-            <button 
-              onClick={() => setView("list")}
-              style={{ width: 34, height: 34, borderRadius: 8, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, background: view === "list" ? "#1a73e8" : "transparent", color: view === "list" ? "#fff" : "#5f6368" }}
-            >☰</button>
-          </div>
-
-          <div style={{ fontSize: 13, color: "#9aa0a6", fontWeight: 600, marginLeft: "auto" }}>{totalFiltered} subjects found</div>
+      {/* CTA */}
+      <div style={{background:"linear-gradient(135deg,#1e40af 0%,#3b82f6 100%)",borderRadius:22,padding:"34px 38px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:20, flexWrap:"wrap"}}>
+        <div>
+          <h3 style={{margin:"0 0 8px",color:"#fff",fontSize:22,fontWeight:800}}>Ready to Ace Your Interview?</h3>
+          <p style={{margin:0,color:"#bfdbfe",fontSize:14,lineHeight:1.6}}>Practice simulated interview rounds based on your subject preparation and get real-time feedback.</p>
         </div>
-
-        {/* Core Subjects Section */}
-        {filteredCore.length > 0 && (
-          <div style={{ marginBottom: 40 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-              <div style={{ width: 5, height: 28, background: "#1a73e8", borderRadius: 99 }}></div>
-              <h2 style={{ fontSize: 20, fontWeight: 800, margin: 0, color: "#1a1a2e" }}>Core Engineering Subjects</h2>
-              <span style={{ background: "#e8f0fe", color: "#1a73e8", fontSize: 12, fontWeight: 800, padding: "2px 10px", borderRadius: 99 }}>{filteredCore.length}</span>
-            </div>
-            <div style={{ 
-              display: view === "grid" ? "grid" : "flex", 
-              flexDirection: view === "grid" ? "initial" : "column",
-              gridTemplateColumns: view === "grid" ? "repeat(auto-fill, minmax(300px, 1fr))" : "none", 
-              gap: 18 
-            }}>
-              {filteredCore.map(s => <SubjectCard key={s.id} subject={s} onSelect={setSelected} view={view} />)}
-            </div>
-          </div>
-        )}
-
-        {/* Special Subjects Section */}
-        {filteredSpecial.length > 0 && (
-          <div style={{ marginBottom: 40 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-              <div style={{ width: 5, height: 28, background: "#9334ea", borderRadius: 99 }}></div>
-              <h2 style={{ fontSize: 20, fontWeight: 800, margin: 0, color: "#1a1a2e" }}>Specialization & Programming</h2>
-              <span style={{ background: "#f3e8fd", color: "#9334ea", fontSize: 12, fontWeight: 800, padding: "2px 10px", borderRadius: 99 }}>{filteredSpecial.length}</span>
-            </div>
-            <div style={{ 
-              display: view === "grid" ? "grid" : "flex", 
-              flexDirection: view === "grid" ? "initial" : "column",
-              gridTemplateColumns: view === "grid" ? "repeat(auto-fill, minmax(300px, 1fr))" : "none", 
-              gap: 18 
-            }}>
-              {filteredSpecial.map(s => <SubjectCard key={s.id} subject={s} onSelect={setSelected} view={view} />)}
-            </div>
-          </div>
-        )}
-
-        {/* Empty State */}
-        {totalFiltered === 0 && (
-          <div style={{ textAlign: "center", padding: "80px 20px" }}>
-            <div style={{ fontSize: 60, marginBottom: 16 }}>🔍</div>
-            <h2 style={{ fontSize: 22, fontWeight: 800, color: "#1a1a2e", margin: "0 0 8px 0" }}>No subjects found</h2>
-            <p style={{ color: "#5f6368", marginBottom: 24 }}>Try adjusting your search or difficulty filters</p>
-            <button 
-              onClick={() => { setSearch(""); setFilter("All"); setSort("Default"); }}
-              style={{ background: "#1a73e8", color: "#fff", border: "none", borderRadius: 12, padding: "12px 28px", fontWeight: 700, cursor: "pointer", fontSize: 14 }}
-            >Clear All Filters</button>
-          </div>
-        )}
-
-        {/* Bottom CTA */}
-        <div style={{ 
-          background: "linear-gradient(135deg, #1a73e8 0%, #1558b0 100%)", 
-          borderRadius: 24, 
-          padding: "36px 44px", 
-          color: "#fff", 
-          display: "flex", 
-          alignItems: "center", 
-          justifyContent: "space-between", 
-          flexWrap: "wrap", 
-          gap: 24,
-          boxShadow: "0 15px 35px rgba(26,115,232,0.25)"
-        }}>
-          <div style={{ flex: 1, minWidth: 300 }}>
-            <h2 style={{ fontSize: 26, fontWeight: 800, margin: "0 0 10px 0" }}>Ready to Ace Your Interview?</h2>
-            <p style={{ margin: 0, fontSize: 16, color: "rgba(255,255,255,0.85)", fontWeight: 500, maxWidth: 450 }}>Practice simulated interview rounds based on your subject preparation and get real-time feedback.</p>
-          </div>
-          <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
-            <button 
-              onClick={() => navigate("/interview-rounds")}
-              style={{ background: "#fff", color: "#1a73e8", border: "none", borderRadius: 14, padding: "14px 28px", fontWeight: 800, fontSize: 15, cursor: "pointer", transition: "0.2s" }}
-            >Start Interview Round →</button>
-            <button 
-              onClick={() => navigate("/progress")}
-              style={{ background: "transparent", color: "#fff", border: "2px solid rgba(255,255,255,0.4)", borderRadius: 14, padding: "12px 28px", fontWeight: 800, fontSize: 15, cursor: "pointer", transition: "0.2s" }}
-            >View Progress</button>
-          </div>
+        <div style={{display:"flex",gap:12,flexShrink:0}}>
+          <button style={{padding:"13px 22px",background:"rgba(255,255,255,.15)",color:"#fff",border:"1.5px solid rgba(255,255,255,.5)",borderRadius:12,fontSize:14,fontWeight:700,cursor:"pointer",backdropFilter:"blur(8px)"}}>
+            Start Interview Round →
+          </button>
+          <button style={{padding:"13px 22px",background:"rgba(255,255,255,.15)",color:"#fff",border:"1.5px solid rgba(255,255,255,.5)",borderRadius:12,fontSize:14,fontWeight:700,cursor:"pointer"}}>
+            View Progress
+          </button>
         </div>
-
       </div>
 
       {/* Modal */}
-      {selected && <SubjectModal subject={selected} onClose={() => setSelected(null)} />}
+      {modal && <SubjectModal subject={modal} onClose={()=>setModal(null)} onContinue={s=>{setModal(null);onSelectSubject(s);}}/>}
+    </div>
+  );
+}
+
+// ────────────────────────────────────────────────────────────────────
+// TOPIC SELECTOR PAGE
+// ────────────────────────────────────────────────────────────────────
+function TopicSelectorPage({ subject, onSelectTopic, onBack }) {
+  const progress = localProgress[subject.code] || {};
+  return (
+    <div className="fade-in" style={{minHeight:"100vh",background:"#f0f4ff",padding:"24px 20px"}}>
+      <div style={{maxWidth:720,margin:"0 auto"}}>
+        <button onClick={onBack} style={{border:"none",background:"none",color:"#2563eb",fontSize:14,cursor:"pointer",marginBottom:20,fontWeight:700,padding:0,display:"flex",alignItems:"center",gap:6}}>
+          ← Back to Subjects
+        </button>
+
+        <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:8}}>
+          <div style={{width:56,height:56,borderRadius:16,background:subject.bg,display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,border:`1.5px solid ${subject.color}20`}}>
+            {subject.emoji}
+          </div>
+          <div>
+            <h1 style={{margin:"0 0 4px",fontSize:22,fontWeight:800}}>{subject.name}</h1>
+            <p style={{margin:0,color:"#888",fontSize:13}}>{subject.topics_list.length} topics · {subject.questions} questions · <DiffBadge difficulty={subject.difficulty}/></p>
+          </div>
+        </div>
+
+        <div style={{background:"#fff",borderRadius:16,padding:"18px 20px",marginBottom:24,border:"1px solid #e5e7eb"}}>
+          <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
+            <span style={{fontSize:14,fontWeight:600}}>Overall Progress</span>
+            <span style={{fontSize:14,color:subject.color,fontWeight:700}}>{subject.progress}%</span>
+          </div>
+          <ProgressBar pct={subject.progress} color={subject.color} height={10}/>
+        </div>
+
+        <h2 style={{fontSize:17,fontWeight:700,marginBottom:16,color:"#333"}}>Choose a Topic to Practice</h2>
+
+        <div className="topic-grid" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
+          {subject.topics_list.map((topic,i)=>{
+            const topicProgress = progress[topic.name];
+            const acc = topicProgress ? Math.round((topicProgress.correct/topicProgress.total)*100) : null;
+            return (
+              <button key={topic.name} onClick={()=>onSelectTopic(topic.name)}
+                style={{background:"#fff",border:`1.5px solid ${subject.color}28`,borderRadius:16,padding:"20px",textAlign:"left",cursor:"pointer",transition:"all .2s",display:"flex",flexDirection:"column",gap:8,boxShadow:"0 1px 4px rgba(0,0,0,.04)"}}
+                onMouseOver={e=>{e.currentTarget.style.borderColor=subject.color;e.currentTarget.style.background=subject.bg;e.currentTarget.style.boxShadow=`0 6px 20px ${subject.color}20`}}
+                onMouseOut={e=>{e.currentTarget.style.borderColor=subject.color+"28";e.currentTarget.style.background="#fff";e.currentTarget.style.boxShadow="0 1px 4px rgba(0,0,0,.04)"}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+                  <span style={{fontSize:15,fontWeight:700,color:"#111"}}>{topic.name}</span>
+                  {topic.done && <span style={{fontSize:12,background:"#f0fdf4",color:"#16a34a",padding:"2px 8px",borderRadius:20,fontWeight:700}}>✓ Done</span>}
+                </div>
+                <div style={{fontSize:12,color:"#888"}}>{topic.count} questions</div>
+                {acc !== null && (
+                  <div style={{display:"flex",alignItems:"center",gap:6}}>
+                    <ProgressBar pct={acc} color={acc>=70?"#16a34a":acc>=40?"#d97706":"#dc2626"}/>
+                    <span style={{fontSize:12,fontWeight:700,color:acc>=70?"#16a34a":acc>=40?"#d97706":"#dc2626"}}>{acc}%</span>
+                  </div>
+                )}
+                <div style={{display:"flex",justifyContent:"flex-end"}}>
+                  <span style={{fontSize:13,color:subject.color,fontWeight:700}}>{topicProgress ? "Retry →" : "Start →"}</span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ────────────────────────────────────────────────────────────────────
+// MCQ PRACTICE PAGE  (the main practice screen)
+// ────────────────────────────────────────────────────────────────────
+function MCQPracticePage({ subject, topic, onBack, onFinish }) {
+  const [questions, setQuestions] = useState([]);
+  const [loading, setLoading]     = useState(true);
+  const [current, setCurrent]     = useState(0);
+  const [selected, setSelected]   = useState(null);
+  const [answered, setAnswered]   = useState(false);
+  const [score, setScore]         = useState(0);
+  const [timeLeft, setTimeLeft]   = useState(30);
+  const [finished, setFinished]   = useState(false);
+  const [results, setResults]     = useState([]);
+  const [showExplain, setShowExplain] = useState(false);
+  const timerRef = useRef(null);
+
+  // Load questions
+  useEffect(()=>{
+    setLoading(true);
+    apiFetchQuestions(subject.code, topic, 10).then(qs=>{setQuestions(qs);setLoading(false);});
+  },[subject.code, topic]);
+
+  // Timer
+  useEffect(()=>{
+    if(loading || answered || finished || questions.length===0) return;
+    timerRef.current = setInterval(()=>{
+      setTimeLeft(t=>{
+        if(t<=1){ clearInterval(timerRef.current); handleAnswer(null,true); return 0; }
+        return t-1;
+      });
+    },1000);
+    return ()=>clearInterval(timerRef.current);
+  },[loading, current, answered, finished, questions.length]);
+
+  const handleAnswer = useCallback((label, timeout=false)=>{
+    clearInterval(timerRef.current);
+    if(answered) return;
+    const q = questions[current];
+    const correct = !timeout && label===q.correct;
+    setSelected(timeout ? null : label);
+    setAnswered(true);
+    setShowExplain(false);
+    if(correct) setScore(s=>s+1);
+    recordLocalProgress(subject.code, topic, correct);
+    apiSubmitAnswer(subject.code, q._id, label, correct);
+    setResults(r=>[...r,{
+      question:q.question, selected:timeout?"⏰ Timed out":label,
+      correct:q.correct, isCorrect:correct,
+      explanation:q.explanation, difficulty:q.difficulty
+    }]);
+  },[answered, current, questions, subject.code, topic]);
+
+  const nextQuestion = ()=>{
+    if(current+1>=questions.length){ setFinished(true); return; }
+    setCurrent(c=>c+1); setSelected(null); setAnswered(false); setTimeLeft(30); setShowExplain(false);
+  };
+
+  // ── LOADING ──
+  if(loading) return (
+    <div style={{minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"#f0f4ff",gap:16}}>
+      <Spinner color={subject.color}/>
+      <p style={{color:"#888",fontSize:15}}>Loading {topic} questions...</p>
+    </div>
+  );
+
+  // ── RESULTS SCREEN ──
+  if(finished){
+    const pct = Math.round((score/questions.length)*100);
+    const grade = pct>=80?"🏆 Excellent!":pct>=60?"👍 Good Job!":pct>=40?"📖 Keep Practicing":"💪 Don't Give Up!";
+    return (
+      <div className="fade-in" style={{minHeight:"100vh",background:"#f0f4ff",padding:"32px 20px"}}>
+        <div style={{maxWidth:600,margin:"0 auto"}}>
+          {/* Result header */}
+          <div style={{background:"#fff",borderRadius:24,padding:"40px 30px",textAlign:"center",boxShadow:"0 10px 30px rgba(0,0,0,.05)",border:"1px solid #e5e7eb",marginBottom:24}}>
+            <div style={{fontSize:50,marginBottom:16}}>🏁</div>
+            <h1 style={{fontSize:26,fontWeight:900,marginBottom:8}}>{grade}</h1>
+            <p style={{color:"#888",marginBottom:30}}>You completed the <b>{topic}</b> assessment.</p>
+            
+            <div style={{display:"flex",justifyContent:"center",gap:24,marginBottom:32}}>
+              <div style={{textAlign:"center"}}>
+                <div style={{fontSize:32,fontWeight:900,color:subject.color}}>{score}/{questions.length}</div>
+                <div style={{fontSize:12,color:"#aaa",fontWeight:700,letterSpacing:.5,marginTop:2}}>SCORE</div>
+              </div>
+              <div style={{width:1,height:40,background:"#e5e7eb",alignSelf:"center"}}/>
+              <div style={{textAlign:"center"}}>
+                <div style={{fontSize:32,fontWeight:900,color:pct>=60?"#16a34a":"#dc2626"}}>{pct}%</div>
+                <div style={{fontSize:12,color:"#aaa",fontWeight:700,letterSpacing:.5,marginTop:2}}>ACCURACY</div>
+              </div>
+            </div>
+
+            <div style={{display:"flex",gap:12}}>
+              <button onClick={()=>{setCurrent(0);setScore(0);setAnswered(false);setFinished(false);setResults([]);}}
+                style={{flex:1,padding:"14px",border:`1.5px solid ${subject.color}`,background:"none",color:subject.color,borderRadius:12,fontSize:14,fontWeight:700,cursor:"pointer"}}>
+                🔄 Retry
+              </button>
+              <button onClick={onFinish} style={{padding:"14px",border:"none",borderRadius:12,background:subject.color,color:"#fff",fontSize:13,fontWeight:700,cursor:"pointer"}}>
+                Next Topic →
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── PRACTICE SCREEN ──
+  const q = questions[current];
+  const timerPct = (timeLeft/30)*100;
+  const timerColor = timeLeft>15?"#16a34a":timeLeft>7?"#d97706":"#dc2626";
+
+  const optionStyle = (label) => {
+    const base = {display:"flex",alignItems:"center",gap:14,padding:"15px 18px",borderRadius:13,border:"1.5px solid",cursor:"pointer",transition:"all .15s",marginBottom:10,background:"#fff",width:"100%",textAlign:"left"};
+    if(!answered) {
+      return {...base, borderColor:selected===label?subject.color:"#e5e7eb", background:selected===label?subject.color+"10":"#fff"};
+    }
+    if(label===q.correct)          return {...base,borderColor:"#16a34a",background:"#f0fdf4",cursor:"default"};
+    if(label===selected)            return {...base,borderColor:"#dc2626",background:"#fff5f5",cursor:"default"};
+    return {...base,borderColor:"#e5e7eb",opacity:.45,cursor:"default"};
+  };
+
+  const labelStyle = (label) => {
+    const base = {width:34,height:34,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:800,flexShrink:0};
+    if(!answered) return {...base,background:selected===label?subject.color:"#f3f4f6",color:selected===label?"#fff":"#555"};
+    if(label===q.correct) return {...base,background:"#dcfce7",color:"#16a34a"};
+    if(label===selected)  return {...base,background:"#fee2e2",color:"#dc2626"};
+    return {...base,background:"#f3f4f6",color:"#aaa"};
+  };
+
+  return (
+    <div className="fade-in" style={{minHeight:"100vh",background:"#f0f4ff",padding:"24px 20px"}}>
+      <div style={{maxWidth:700,margin:"0 auto"}}>
+        {/* Top bar */}
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20}}>
+          <button onClick={onBack} style={{border:"none",background:"none",color:"#2563eb",fontSize:14,cursor:"pointer",fontWeight:700}}>← Topics</button>
+          <div style={{textAlign:"center"}}>
+            <div style={{fontSize:13,fontWeight:700,color:subject.color}}>{subject.name}</div>
+            <div style={{fontSize:12,color:"#888"}}>{topic}</div>
+          </div>
+          <div style={{background:subject.color+"18",color:subject.color,padding:"6px 16px",borderRadius:20,fontSize:14,fontWeight:800}}>
+            {current+1} / {questions.length}
+          </div>
+        </div>
+
+        {/* Progress bar */}
+        <div style={{marginBottom:16}}>
+          <ProgressBar pct={(current/questions.length)*100} color={subject.color} height={6}/>
+        </div>
+
+        {/* Timer */}
+        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:20}}>
+          <div style={{flex:1,background:"#e5e7eb",borderRadius:999,height:7,overflow:"hidden"}}>
+            <div style={{width:`${timerPct}%`,background:timerColor,height:"100%",borderRadius:999,transition:"width 1s linear, background .3s"}}/>
+          </div>
+          <div style={{fontSize:15,fontWeight:900,color:timerColor,minWidth:36,textAlign:"right"}}>{timeLeft}s</div>
+        </div>
+
+        {/* Score tracker */}
+        <div style={{display:"flex",gap:8,marginBottom:20}}>
+          {questions.map((_,i)=>(
+            <div key={i} style={{flex:1,height:4,borderRadius:999,background:i<results.length?(results[i].isCorrect?"#16a34a":"#dc2626"):i===current?subject.color:"#e5e7eb",transition:"background .3s"}}/>
+          ))}
+        </div>
+
+        {/* Question card */}
+        <div className="fade-in" style={{background:"#fff",borderRadius:20,padding:"28px 26px",marginBottom:18,boxShadow:"0 2px 12px rgba(0,0,0,.06)",border:"1px solid #e5e7eb"}}>
+          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14}}>
+            <span style={{background:subject.color+"18",color:subject.color,padding:"3px 12px",borderRadius:20,fontSize:12,fontWeight:800}}>Q{current+1}</span>
+            <DiffBadge difficulty={q.difficulty||"Medium"}/>
+          </div>
+          <p style={{fontSize:17,fontWeight:600,color:"#111",margin:0,lineHeight:1.7}}>{q.question}</p>
+        </div>
+
+        {/* Options */}
+        <div style={{marginBottom:16}}>
+          {q.options.map(opt=>(
+            <button key={opt.label} style={optionStyle(opt.label)} onClick={()=>!answered && handleAnswer(opt.label)}>
+              <span style={labelStyle(opt.label)}>{opt.label}</span>
+              <span style={{fontSize:15,color:"#222",flex:1}}>{opt.text}</span>
+              {answered && opt.label===q.correct && <span style={{fontSize:20,marginLeft:"auto",flexShrink:0}}>✓</span>}
+              {answered && opt.label===selected && opt.label!==q.correct && <span style={{fontSize:20,marginLeft:"auto",flexShrink:0}}>✗</span>}
+            </button>
+          ))}
+        </div>
+
+        {/* Explanation toggle */}
+        {answered && q.explanation && (
+          <div style={{marginBottom:16}}>
+            <button onClick={()=>setShowExplain(s=>!s)}
+              style={{border:`1px solid ${subject.color}40`,background:subject.color+"08",color:subject.color,padding:"8px 16px",borderRadius:10,fontSize:13,fontWeight:700,cursor:"pointer",marginBottom:showExplain?10:0}}>
+              {showExplain?"▲ Hide":"▼ Show"} Explanation
+            </button>
+            {showExplain && (
+              <div style={{background:"#fffbeb",border:"1px solid #fde68a",borderRadius:14,padding:"16px 18px"}}>
+                <p style={{margin:"0 0 4px",fontSize:13,fontWeight:700,color:"#92400e"}}>💡 Explanation</p>
+                <p style={{margin:0,fontSize:14,color:"#78350f",lineHeight:1.7}}>{q.explanation}</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Next button */}
+        {answered && (
+          <button onClick={nextQuestion}
+            style={{width:"100%",padding:"16px",background:subject.color,color:"#fff",border:"none",borderRadius:14,fontSize:16,fontWeight:800,cursor:"pointer",transition:"opacity .2s"}}
+            onMouseOver={e=>e.target.style.opacity=.88} onMouseOut={e=>e.target.style.opacity=1}>
+            {current+1>=questions.length ? "Finish Session 🏁" : "Next Question →"}
+          </button>
+        )}
+
+        {/* Keyboard hint */}
+        {!answered && (
+          <p style={{textAlign:"center",color:"#bbb",fontSize:12,marginTop:12}}>Click an option to answer · Timer resets on next question</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+  );
+}
+
+// ────────────────────────────────────────────────────────────────────
+// ROOT APP (Exported as SubjectsPage)
+// ────────────────────────────────────────────────────────────────────
+export default function SubjectsPage() {
+  const navigate = useNavigate();
+  const [screen, setScreen]         = useState("subjects");  // subjects | topics | mcq | dashboard
+  const [selSubject, setSelSubject] = useState(null);
+  const [selTopic, setSelTopic]     = useState(null);
+
+  // inject global CSS once
+  useEffect(()=>{
+    const tag = document.createElement("style");
+    tag.innerHTML = GLOBAL_CSS;
+    document.head.appendChild(tag);
+    return ()=>document.head.removeChild(tag);
+  },[]);
+
+  const goToSubject = (subject) => { setSelSubject(subject); setScreen("topics"); };
+  const goToTopic   = (topic)   => { setSelTopic(topic);   setScreen("mcq");    };
+  const goBack      = ()        => setScreen("subjects");
+  const backToTopics= ()        => setScreen("topics");
+  const finishMCQ   = ()        => setScreen("topics");
+  
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/login");
+  };
+
+  return (
+    <div style={{minHeight:"100vh",background:"#f0f4ff"}}>
+      <Navbar view={screen} onNavigate={v=>{
+        if(v==="subjects") setScreen("subjects");
+      }} onLogout={handleLogout} />
+
+      {screen==="subjects"  && <SubjectsPageContent onSelectSubject={goToSubject}/>}
+      {screen==="topics"    && selSubject && <TopicSelectorPage subject={selSubject} onSelectTopic={goToTopic} onBack={goBack}/>}
+      {screen==="mcq"       && selSubject && selTopic &&
+        <MCQPracticePage subject={selSubject} topic={selTopic} onBack={backToTopics} onFinish={finishMCQ}/>}
     </div>
   );
 }

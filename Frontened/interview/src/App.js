@@ -7,38 +7,36 @@ import Home from "./component/Pages/Home";
 import SubjectsPage from "./component/Pages/SubjectsPage";
 import Dashboard from "./component/routingpages/Dashboard";
 import ProgressPage from "./component/Pages/ProgressPage";
-import Feature from "./component/Feature/Feature";
+import InterviewRounds from "./component/routingpages/InterviewRounds";
 import HRround from "./component/roundpage/HRround";
 import TechnicalRoundPage from "./component/Pages/TechnicalRoundPage";
-import Aptitude1 from "./component/APtitude/Aptitude1";
-import Aptitudeee from "./component/APtitude/Aptitudeee";
+import AptitudeRound from "./component/APtitude/AptitudeRound";
+import HrAptitudeTest from "./component/HrRoundpage/HrAptitudeTest";
 import Privateroute from "./component/signuppage/Privateroute";
-import Report from "./component/APtitude/Report";
 import TestPage from "./component/Pages/Test";
 import Scrolltotop from "./component/Scrolltotop";
 import Hrroundpage1 from "./component/HrRoundpage/Hrroundpage1";
 import Hrroundpage2Backend from "./component/HrRoundpage/Hrroundpage2Backend";
 import InterviewFeedback from "./component/HrRoundpage/InterviewFeedback";
+import ProctoringWrapper from "./component/ProctoringWrapper";
+import SecurityWrapper from "./component/SecurityWrapper";
 
+
+// Test-only routes jahan security lock active hoga
+const TEST_ROUTES = ["/aptitude", "/hr-aptitude", "/technical-round", "/test", "/hr-round-1", "/hr-round-2"];
 
 const AppContent = () => {
   const location = useLocation();
-<<<<<<< Updated upstream
-  const isLoginPage = location.pathname === "/login";
-  // Optionally, you can use hideGlobalNavbar if you want to hide the navbar on more pages:
-  // const hideGlobalNavbar = location.pathname === "/login" || location.pathname === "/progress" || location.pathname === "/subjects" || location.pathname === "/dashboard" || location.pathname === "/technical-round" || location.pathname === "/test";
-=======
-  const isNavbarHiddenPage = ["/login", "/technical-round"].includes(location.pathname);
-  const isHrInterviewPage = ["/hr-round", "/hr-round-1", "/hr-round-2", "/interview-feedback"].includes(location.pathname);
->>>>>>> Stashed changes
+  const hideGlobalNavbar = location.pathname === "/login" || location.pathname === "/progress" || location.pathname === "/subjects" || location.pathname === "/dashboard" || location.pathname === "/technical-round" || location.pathname === "/test" || location.pathname === "/aptitude" || location.pathname === "/hr-aptitude" || location.pathname === "/proctoring";
 
-  return (
+  const isTestRoute = TEST_ROUTES.includes(location.pathname);
+
+  const content = (
     <>
-      {!isNavbarHiddenPage && <Navbar />}
-    <Scrolltotop/>
+      {!hideGlobalNavbar && <Navbar />}
+      <Scrolltotop/>
       <Routes>
         <Route path="/login" element={<Login />} />
-
         <Route
           path="/"
           element={
@@ -47,7 +45,6 @@ const AppContent = () => {
             </Privateroute>
           }
         />
-
         <Route
           path="/subjects"
           element={
@@ -56,7 +53,6 @@ const AppContent = () => {
             </Privateroute>
           }
         />
-
         <Route
           path="/dashboard"
           element={
@@ -65,7 +61,6 @@ const AppContent = () => {
             </Privateroute>
           }
         />
-
         <Route
           path="/progress"
           element={
@@ -74,17 +69,14 @@ const AppContent = () => {
             </Privateroute>
           }
         />
-
         <Route
           path="/interview-rounds"
           element={
             <Privateroute>
-              <Feature />
+              <InterviewRounds />
             </Privateroute>
           }
         />
-
-
         <Route
           path="/hr-round"
           element={
@@ -93,33 +85,23 @@ const AppContent = () => {
             </Privateroute>
           }
         />
+
         <Route
-        path="/hr-round-1"
+          path="/interview-feedback"
           element={
             <Privateroute>
-              <Hrroundpage1 />
+              <InterviewFeedback />
             </Privateroute>
           }
         />
         <Route
-        path="/hr-round-2"
-        element={
-          <Privateroute>
-            <Hrroundpage2Backend />
-          </Privateroute>
-        }
+          path="/hr-aptitude"
+          element={
+            <Privateroute>
+              <HrAptitudeTest />
+            </Privateroute>
+          }
         />
-
-        <Route
-        path="/interview-feedback"
-        element={
-          <Privateroute>
-            <InterviewFeedback />
-          </Privateroute>
-        }
-        />
-
-
         <Route
           path="/technical-round"
           element={
@@ -128,26 +110,14 @@ const AppContent = () => {
             </Privateroute>
           }
         />
-
         <Route
           path="/aptitude"
           element={
             <Privateroute>
-              <Aptitude1 />
+              <AptitudeRound />
             </Privateroute>
           }
         />
-
-        <Route
-          path="/aptitude2"
-          element={
-            <Privateroute>
-              <Aptitudeee />
-            </Privateroute>
-          }
-        />
-        <Route path="/report" element={<Privateroute><Report /></Privateroute>} />
-
         <Route
           path="/test"
           element={
@@ -156,13 +126,39 @@ const AppContent = () => {
             </Privateroute>
           }
         />
-
+        <Route
+          path="/hr-round-1"
+          element={
+            <Privateroute>
+              <Hrroundpage1 />
+            </Privateroute>
+          }
+        />
+        <Route
+          path="/hr-round-2"
+          element={
+            <Privateroute>
+              <SecurityWrapper>
+                <Hrroundpage2Backend />
+              </SecurityWrapper>
+            </Privateroute>
+          }
+        />
+        <Route
+          path="/proctoring"
+          element={
+            <Privateroute>
+              <ProctoringWrapper />
+            </Privateroute>
+          }
+        />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
-
-      {!isNavbarHiddenPage && !isHrInterviewPage && <Footer />}
+      {!hideGlobalNavbar && <Footer />}
     </>
   );
+
+  return content;
 };
 
 const App = () => {
@@ -174,3 +170,4 @@ const App = () => {
 };
 
 export default App;
+

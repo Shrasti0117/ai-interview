@@ -46,7 +46,7 @@ const Feature = () => {
             </ul>
           </Link>
 
-        
+          {/* Group Discussion */}
          <Link to="/aptitude" className="feature-card aptitude">
   <div className="icon">🧠</div>
   <h3>Aptitude Round</h3>

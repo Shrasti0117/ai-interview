@@ -1,6 +1,6 @@
 .subjects-section {
   padding: 60px 20px;
-  background-color: var(--bg-page);
+  background-color: #f9fafb;
   text-align: center;
 }
 
@@ -11,44 +11,34 @@
 }
 
 .subjects-section p {
-  color: var(--text-muted);
+  color: #555;
   margin-bottom: 40px;
 }
 
 .subjects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
-  max-width: 1000px;
-  margin: 0 auto 60px;
+  max-width: 1200px;
+  margin: 0 auto 40px;
 }
 
 .subject-card {
   padding: 25px 15px;
   border-radius: 12px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  box-shadow: 0px 3px 12px rgba(15, 23, 42, 0.05);
+  box-shadow: 0px 3px 12px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
   cursor: pointer;
 }
 
 .subject-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0px 5px 20px rgba(15, 23, 42, 0.12);
+  box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.1);
 }
 
 .subject-card .icon {
   font-size: 28px;
   margin-bottom: 12px;
-}
-
-html[data-theme="dark"] .subjects-section {
-  background: var(--bg-page);
-}
-
-html[data-theme="dark"] .subject-card {
-  box-shadow: 0px 14px 28px rgba(0, 0, 0, 0.22);
 }
 
 

@@ -5,11 +5,11 @@ import { useNavigate } from "react-router-dom";
 
 function StatCard({ icon, value, label, color, bg }) {
   return (
-    <div style={{ background: "var(--bg-surface)", borderRadius: 16, padding: 20, border: "1px solid var(--border-color)", display: "flex", alignItems: "center", gap: 16, flex: 1, minWidth: 200 }}>
+    <div style={{ background: "#fff", borderRadius: 16, padding: 20, border: "1px solid #e8eaed", display: "flex", alignItems: "center", gap: 16, flex: 1, minWidth: 200 }}>
       <div style={{ width: 44, height: 44, borderRadius: 12, background: bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>{icon}</div>
       <div>
         <div style={{ fontSize: 22, fontWeight: 800, color }}>{value}</div>
-        <div style={{ fontSize: 13, color: "var(--text-muted)", fontWeight: 700, marginTop: 2 }}>{label}</div>
+        <div style={{ fontSize: 13, color: "#9aa0a6", fontWeight: 700, marginTop: 2 }}>{label}</div>
       </div>
     </div>
   );
@@ -17,17 +17,17 @@ function StatCard({ icon, value, label, color, bg }) {
 
 function SubjectMiniCard({ title, progress, color, icon, onClick }) {
   return (
-    <div style={{ background: "var(--bg-surface)", borderRadius: 16, padding: 20, border: "1px solid var(--border-color)", display: "flex", flexDirection: "column", gap: 12 }}>
+    <div style={{ background: "#fff", borderRadius: 16, padding: 20, border: "1px solid #e8eaed", display: "flex", flexDirection: "column", gap: 12 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
         <div style={{ width: 36, height: 36, borderRadius: 10, background: color + "15", color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{icon}</div>
-        <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text-heading)" }}>{title}</div>
+        <div style={{ fontSize: 14, fontWeight: 700, color: "#1a1a2e" }}>{title}</div>
       </div>
       <div>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 6 }}>
-          <span style={{ color: "var(--text-muted)", fontWeight: 600 }}>Progress</span>
+          <span style={{ color: "#9aa0a6", fontWeight: 600 }}>Progress</span>
           <span style={{ color, fontWeight: 700 }}>{progress}%</span>
         </div>
-        <div style={{ height: 6, background: "var(--bg-surface-alt)", borderRadius: 99, overflow: "hidden" }}>
+        <div style={{ height: 6, background: "#f1f3f4", borderRadius: 99, overflow: "hidden" }}>
           <div style={{ width: `${progress}%`, height: "100%", background: color, borderRadius: 99 }} />
         </div>
       </div>
@@ -45,29 +45,15 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState("");
-  const [plannerFilter, setPlannerFilter] = useState("all");
+  const [hoveredNav, setHoveredNav] = useState(null);
 
   useEffect(() => {
-    try {
-      const savedTasks = JSON.parse(localStorage.getItem("plannerTasks"));
-      const fallbackTasks = [
-        { id: 1, text: "Revise Array questions on LeetCode", completed: false },
-        { id: 2, text: "Read about DBMS Normalization", completed: true },
-        { id: 3, text: "Take a mock technical interview", completed: false }
-      ];
-
-      if (Array.isArray(savedTasks)) {
-        setTasks(savedTasks);
-      } else {
-        setTasks(fallbackTasks);
-      }
-    } catch {
-      setTasks([
-        { id: 1, text: "Revise Array questions on LeetCode", completed: false },
-        { id: 2, text: "Read about DBMS Normalization", completed: true },
-        { id: 3, text: "Take a mock technical interview", completed: false }
-      ]);
-    }
+    const savedTasks = JSON.parse(localStorage.getItem("plannerTasks")) || [
+      { id: 1, text: "Revise Array questions on LeetCode", completed: false },
+      { id: 2, text: "Read about DBMS Normalization", completed: true },
+      { id: 3, text: "Take a mock technical interview", completed: false }
+    ];
+    setTasks(savedTasks);
   }, []);
 
   useEffect(() => {
@@ -83,39 +69,26 @@ export default function Dashboard() {
   };
 
   const addTask = () => {
-    const trimmedTask = newTask.trim();
-    if (!trimmedTask) return;
-
-    const duplicateExists = tasks.some(task => task.text.toLowerCase() === trimmedTask.toLowerCase());
-    if (duplicateExists) return;
-
-    setTasks([{ id: Date.now(), text: trimmedTask, completed: false }, ...tasks]);
+    if (newTask.trim() === "") return;
+    setTasks([...tasks, { id: Date.now(), text: newTask, completed: false }]);
     setNewTask("");
   };
 
-  const clearCompleted = () => {
-    setTasks(tasks.filter(task => !task.completed));
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/login");
   };
-
-  const plannerSummary = {
-    total: tasks.length,
-    completed: tasks.filter(task => task.completed).length,
-  };
-  plannerSummary.pending = plannerSummary.total - plannerSummary.completed;
-
-  const filteredTasks = tasks.filter(task => {
-    if (plannerFilter === "pending") return !task.completed;
-    if (plannerFilter === "completed") return task.completed;
-    return true;
-  });
 
   return (
-<<<<<<< Updated upstream
     <div style={{ background: "#f0f4ff", minHeight: "100vh", fontFamily: "'Sora', sans-serif" }}>
-      {/* Navbar (from priyanshu branch) */}
+      
+      {/* Navbar */}
       <nav style={{ background: "#fff", borderBottom: "1px solid #e8eaed", height: 62, padding: "0 32px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 500 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} onClick={() => navigate("/")}>
-          <img src="/logo.png" alt="Logo" style={{ width: 40, height: 40, objectFit: "contain", borderRadius: "50%", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }} />
+          <img src="/logo.png" alt="Logo" style={{ width: 42, height: 42, objectFit: "cover", borderRadius: "50%", boxShadow: "0 4px 12px rgba(0,0,0,0.12)", transition: "all 0.3s ease" }} 
+            onMouseEnter={e => e.currentTarget.style.transform = "scale(1.1)"}
+            onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
+          />
           <div style={{ fontWeight: 800, fontSize: 20, color: "#1a73e8" }}>InterviewAce</div>
         </div>
         <div style={{ display: "flex", gap: 32, height: "100%" }}>
@@ -132,187 +105,27 @@ export default function Dashboard() {
         </div>
         <button onClick={handleLogout} style={{ background: "#1a73e8", color: "#fff", border: "none", borderRadius: 9, padding: "8px 22px", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>Logout</button>
       </nav>
-=======
-    <div style={{ background: "var(--bg-page)", minHeight: "100vh", fontFamily: "'Sora', sans-serif", color: "var(--text-main)" }}>
->>>>>>> Stashed changes
 
       <div style={{ maxWidth: 1150, margin: "0 auto", padding: "36px 20px 80px" }}>
         
         {/* Header */}
         <div style={{ marginBottom: 32, display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
           <div>
-            <h1 style={{ fontSize: 32, fontWeight: 800, color: "var(--text-heading)", margin: "0 0 8px 0" }}>👋 Welcome Back!</h1>
-            <p style={{ color: "var(--text-muted)", fontSize: 16, fontWeight: 500 }}>Here's what's happening with your interview preparation today.</p>
+            <h1 style={{ fontSize: 32, fontWeight: 800, color: "#1a1a2e", margin: "0 0 8px 0" }}>👋 Welcome Back!</h1>
+            <p style={{ color: "#5f6368", fontSize: 16, fontWeight: 500 }}>Here's what's happening with your interview preparation today.</p>
           </div>
-          <button 
-            onClick={() => navigate("/interview-rounds")}
-            style={{ background: "var(--primary-blue)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 24px", fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 12px rgba(26,115,232,0.2)" }}
-          >Start Practice Round</button>
+          <div style={{ display: "flex", gap: 12 }}>
+            <button 
+              onClick={() => navigate("/test")}
+              style={{ background: "#34a853", color: "#fff", border: "none", borderRadius: 12, padding: "12px 24px", fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 12px rgba(52,168,83,0.2)" }}
+            >Start Practice Test</button>
+            <button 
+              onClick={() => navigate("/interview-rounds")}
+              style={{ background: "#1a73e8", color: "#fff", border: "none", borderRadius: 12, padding: "12px 24px", fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 12px rgba(26,115,232,0.2)" }}
+            >Start Practice Round</button>
+          </div>
         </div>
 
-        {/* Stats Grid */}
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 16, marginBottom: 32 }}>
-          <StatCard icon="📊" value="68%" label="Overall Readiness" color="#1a73e8" bg="#e8f0fe" />
-          <StatCard icon="📚" value="12" label="Topics Today" color="#1e8e3e" bg="#e6f4ea" />
-          <StatCard icon="🏆" value="450" label="Points Earned" color="#e37400" bg="#fff3e0" />
-          <StatCard icon="🔥" value="5 Days" label="Current Streak" color="#d93025" bg="#fce8e6" />
-        </div>
-
-        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 24 }}>
-          
-          {/* Left Column: Learning Progress */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-            <div style={{ background: "var(--bg-surface)", borderRadius: 20, padding: 28, border: "1px solid var(--border-color)" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-                <h2 style={{ fontSize: 18, fontWeight: 800, margin: 0 }}>📖 Continue Learning</h2>
-                <button onClick={() => navigate("/subjects")} style={{ background: "transparent", color: "var(--primary-blue)", border: "none", fontWeight: 700, cursor: "pointer" }}>View All Subjects</button>
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                <SubjectMiniCard title="Data Structures & Algorithms" progress={50} color="#1a73e8" icon="⚡" onClick={() => navigate("/subjects")} />
-                <SubjectMiniCard title="Operating Systems" progress={20} color="#9334ea" icon="⚙️" onClick={() => navigate("/subjects")} />
-                <SubjectMiniCard title="DBMS" progress={35} color="#1e8e3e" icon="🗄️" onClick={() => navigate("/subjects")} />
-                <SubjectMiniCard title="System Design" progress={5} color="#e37400" icon="🏗️" onClick={() => navigate("/subjects")} />
-              </div>
-            </div>
-
-            <div style={{ background: "linear-gradient(135deg, #1a73e8 0%, #1558b0 100%)", borderRadius: 20, padding: 32, color: "#fff", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div>
-                <h3 style={{ fontSize: 20, fontWeight: 800, margin: "0 0 8px 0" }}>Test Your Knowledge</h3>
-                <p style={{ margin: 0, opacity: 0.9, maxWidth: 300 }}>Take a quick 10-minute aptitude test to stay sharp.</p>
-              </div>
-              <button 
-                onClick={() => navigate("/aptitude")}
-                style={{ background: "#fff", color: "#1a73e8", border: "none", borderRadius: 12, padding: "12px 24px", fontWeight: 800, cursor: "pointer" }}
-              >Take Test</button>
-            </div>
-          </div>
-
-          {/* Right Column: Planner & Quick Links */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-            
-            {/* Planner */}
-            <div style={{ background: "var(--bg-surface)", borderRadius: 20, padding: 28, border: "1px solid var(--border-color)", height: "fit-content" }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-                <h2 style={{ fontSize: 18, fontWeight: 800, margin: 0 }}>📝 Daily Planner</h2>
-                <span style={{ fontSize: 12, fontWeight: 700, color: "var(--text-muted)", background: "var(--bg-surface-alt)", border: "1px solid var(--border-color)", borderRadius: 999, padding: "5px 10px" }}>
-                  {plannerSummary.pending} pending
-                </span>
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 8, marginBottom: 14 }}>
-                {[
-                  { key: "all", label: `All (${plannerSummary.total})` },
-                  { key: "pending", label: `Pending (${plannerSummary.pending})` },
-                  { key: "completed", label: `Done (${plannerSummary.completed})` }
-                ].map(filter => (
-                  <button
-                    key={filter.key}
-                    onClick={() => setPlannerFilter(filter.key)}
-                    style={{
-                      border: "1px solid var(--border-color)",
-                      borderRadius: 10,
-                      padding: "8px 6px",
-                      background: plannerFilter === filter.key ? "var(--primary-blue)" : "var(--bg-surface)",
-                      color: plannerFilter === filter.key ? "#fff" : "var(--text-muted)",
-                      fontSize: 12,
-                      fontWeight: 700,
-                      cursor: "pointer"
-                    }}
-                  >
-                    {filter.label}
-                  </button>
-                ))}
-              </div>
-
-              <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
-                <input 
-                  type="text" 
-                  value={newTask}
-                  onChange={(e) => setNewTask(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") addTask();
-                  }}
-                  placeholder="Add a prep task..."
-                  style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: "1.5px solid var(--border-color)", background: "var(--bg-surface)", color: "var(--text-main)", outline: "none", fontSize: 14 }}
-                />
-                <button onClick={addTask} style={{ background: "var(--primary-blue)", color: "#fff", border: "none", borderRadius: 10, width: 40, height: 40, fontWeight: 800, cursor: "pointer" }}>+</button>
-              </div>
-
-              {plannerSummary.completed > 0 && (
-                <div style={{ marginBottom: 12, display: "flex", justifyContent: "flex-end" }}>
-                  <button
-                    onClick={clearCompleted}
-                    style={{
-                      border: "none",
-                      background: "transparent",
-                      color: "#dc2626",
-                      fontSize: 12,
-                      fontWeight: 700,
-                      cursor: "pointer"
-                    }}
-                  >
-                    Clear completed
-                  </button>
-                </div>
-              )}
-
-              <div style={{ display: "flex", flexDirection: "column", gap: 10, maxHeight: 320, overflowY: "auto", paddingRight: 4 }}>
-                {filteredTasks.map(task => (
-                  <div key={task.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px", borderRadius: 12, background: task.completed ? "var(--bg-surface-alt)" : "var(--bg-page)", border: "1px solid var(--border-color)" }}>
-                    <input 
-                      type="checkbox" 
-                      checked={task.completed} 
-                      onChange={() => toggleTask(task.id)}
-                      style={{ width: 18, height: 18, cursor: "pointer" }}
-                    />
-                    <span style={{ flex: 1, fontSize: 14, color: task.completed ? "var(--text-muted)" : "var(--text-heading)", textDecoration: task.completed ? "line-through" : "none", fontWeight: 500 }}>{task.text}</span>
-                    <button onClick={() => deleteTask(task.id)} style={{ background: "transparent", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: 16 }}>×</button>
-                  </div>
-                ))}
-
-                {filteredTasks.length === 0 && (
-                  <div style={{ textAlign: "center", color: "var(--text-muted)", fontSize: 13, fontWeight: 600, padding: "16px 10px", border: "1px dashed var(--border-color)", borderRadius: 12 }}>
-                    No tasks in this view. Add one to get started.
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Quick Resources */}
-            <div style={{ background: "var(--bg-surface)", borderRadius: 20, padding: 28, border: "1px solid var(--border-color)" }}>
-              <h2 style={{ fontSize: 16, fontWeight: 800, margin: "0 0 16px 0" }}>⚡ Quick Resources</h2>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {[
-                  { name: "LeetCode", url: "https://leetcode.com", color: "#ffa116" },
-                  { name: "GeeksforGeeks", url: "https://geeksforgeeks.org", color: "#2f8d46" },
-                  { name: "InterviewBit", url: "https://interviewbit.com", color: "#0088cc" }
-                ].map(res => (
-                  <a key={res.name} href={res.url} target="_blank" rel="noreferrer" style={{ textDecoration: "none", padding: "12px", borderRadius: 12, border: "1.5px solid var(--border-color)", color: "var(--text-heading)", background: "var(--bg-surface)", fontWeight: 700, fontSize: 13, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    {res.name}
-                    <span style={{ color: res.color }}>↗</span>
-                  </a>
-                ))}
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-
-<<<<<<< Updated upstream
-<<<<<<< HEAD
-        <div className="right">
-          <h2>📝 Today's Planner</h2>
-          <div className="planner">
-            <div className="input-row">
-              <input
-                type="text"
-                value={newTask}
-                onChange={(e) => setNewTask(e.target.value)}
-                placeholder="Add new task..."
-              />
-              <button onClick={addTask} className="add-btn">Add</button>
-=======
         {/* Stats Grid */}
         <div style={{ display: "flex", flexWrap: "wrap", gap: 16, marginBottom: 32 }}>
           <StatCard icon="📊" value="68%" label="Overall Readiness" color="#1a73e8" bg="#e8f0fe" />
@@ -360,35 +173,62 @@ export default function Dashboard() {
                   style={{ background: "#fff", color: "#9334ea", border: "none", borderRadius: 12, padding: "10px", fontWeight: 800, cursor: "pointer", alignSelf: "flex-start" }}
                 >Configure Test</button>
               </div>
->>>>>>> origin/priyanshu
             </div>
-            <ul className="task-list">
-              {tasks.map((task) => (
-                <li key={task.id} className={task.completed ? "done" : ""}>
-                  <div className="task-item">
-                    <input
-                      type="checkbox"
-                      checked={task.completed}
-                      onChange={() => toggleTask(task.id)}
-                    />
-                    <span>{task.text}</span>
-                  </div>
-                  <button onClick={() => deleteTask(task.id)} className="delete-btn">❌</button>
-                </li>
-              ))}
-            </ul>
           </div>
+
+          {/* Right Column: Planner & Quick Links */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+            
+            {/* Planner */}
+            <div style={{ background: "#fff", borderRadius: 20, padding: 28, border: "1px solid #e8eaed", height: "fit-content" }}>
+              <h2 style={{ fontSize: 18, fontWeight: 800, margin: "0 0 16px 0" }}>📝 Daily Planner</h2>
+              <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+                <input 
+                  type="text" 
+                  value={newTask}
+                  onChange={(e) => setNewTask(e.target.value)}
+                  placeholder="Add a prep task..."
+                  style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: "1.5px solid #e8eaed", outline: "none", fontSize: 14 }}
+                />
+                <button onClick={addTask} style={{ background: "#1a73e8", color: "#fff", border: "none", borderRadius: 10, width: 40, height: 40, fontWeight: 800, cursor: "pointer" }}>+</button>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {tasks.map(task => (
+                  <div key={task.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px", borderRadius: 12, background: task.completed ? "#f8f9fa" : "#f0f4ff", border: "1px solid #e8eaed" }}>
+                    <input 
+                      type="checkbox" 
+                      checked={task.completed} 
+                      onChange={() => toggleTask(task.id)}
+                      style={{ width: 18, height: 18, cursor: "pointer" }}
+                    />
+                    <span style={{ flex: 1, fontSize: 14, color: task.completed ? "#9aa0a6" : "#1a1a2e", textDecoration: task.completed ? "line-through" : "none", fontWeight: 500 }}>{task.text}</span>
+                    <button onClick={() => deleteTask(task.id)} style={{ background: "transparent", border: "none", color: "#9aa0a6", cursor: "pointer", fontSize: 16 }}>×</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Quick Resources */}
+            <div style={{ background: "#fff", borderRadius: 20, padding: 28, border: "1px solid #e8eaed" }}>
+              <h2 style={{ fontSize: 16, fontWeight: 800, margin: "0 0 16px 0" }}>⚡ Quick Resources</h2>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {[
+                  { name: "LeetCode", url: "https://leetcode.com", color: "#ffa116" },
+                  { name: "GeeksforGeeks", url: "https://geeksforgeeks.org", color: "#2f8d46" },
+                  { name: "InterviewBit", url: "https://interviewbit.com", color: "#0088cc" }
+                ].map(res => (
+                  <a key={res.name} href={res.url} target="_blank" rel="noreferrer" style={{ textDecoration: "none", padding: "12px", borderRadius: 12, border: "1.5px solid #e8eaed", color: "#1a1a2e", fontWeight: 700, fontSize: 13, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    {res.name}
+                    <span style={{ color: res.color }}>↗</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+
+          </div>
+
         </div>
-      </div>
-        <div className="quick-links">
-        <h2>⚡ Quick Resources</h2>
-        <div className="links">
-          <a href="https://leetcode.com" target="_blank" rel="noreferrer" className="btn green">LeetCode</a>
-          <a href="https://geeksforgeeks.org" target="_blank" rel="noreferrer" className="btn purple">GFG</a>
-          <a href="https://interviewbit.com" target="_blank" rel="noreferrer" className="btn pink">InterviewBit</a>
-        </div>
-=======
->>>>>>> Stashed changes
+
       </div>
     </div>
   );

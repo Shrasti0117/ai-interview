@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import Navbar from "../Navbar/Navbar";
+import SecurityWrapper from "../SecurityWrapper";
 
 const STYLES = `
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
@@ -730,7 +731,13 @@ function TestArena({config,onComplete}) {
     <div style={{minHeight:"100vh",background:"var(--bg)"}}>
       {/* Header */}
       <header className="arena-header">
-        <div className="arena-brand">⚡</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", marginRight: "10px" }} onClick={() => onComplete(null)}>
+          <img src="/logo.png" alt="Logo" style={{ width: 40, height: 40, objectFit: "cover", borderRadius: "50%", boxShadow: "0 4px 12px rgba(0,0,0,0.12)", transition: "all 0.3s ease" }} 
+            onMouseEnter={e => e.currentTarget.style.transform = "scale(1.1)"}
+            onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
+          />
+          <div style={{ fontWeight: '800', fontSize: '16px', color: '#2563eb' }}>InterviewAce</div>
+        </div>
         <div className="arena-breadcrumb">Subjects › {q.subject} › {q.topic}</div>
         <div className="arena-progress-wrap">
           <div className="arena-progress-bar"><div className="arena-progress-fill" style={{width:`${progress}%`}}/></div>
@@ -1087,7 +1094,11 @@ export default function TestPage() {
       <style>{STYLES}</style>
       {stage!=="arena"&&<Navbar stage={stage}/>}
       {stage==="configurator"&&<TestConfigurator onStart={handleStart}/>}
-      {stage==="arena"&&testConfig&&<TestArena config={testConfig} onComplete={handleComplete}/>}
+      {stage==="arena"&&testConfig&&(
+        <SecurityWrapper>
+          <TestArena config={testConfig} onComplete={handleComplete}/>
+        </SecurityWrapper>
+      )}
       {stage==="report"&&testResult&&(
         <>
           <Navbar stage={stage}/>

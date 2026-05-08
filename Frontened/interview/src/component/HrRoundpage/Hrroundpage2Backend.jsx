@@ -184,6 +184,13 @@ const Hrroundpage2Backend = () => {
     <div className="interview-page-container">
       {/* LEFT SIDEBAR - PROGRESS TRACKER */}
       <aside className="interview-sidebar">
+        <div style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", padding: "20px 0", borderBottom: "1px solid rgba(255,255,255,0.1)", marginBottom: "20px" }} onClick={() => navigate("/")}>
+          <img src="/logo.png" alt="Logo" style={{ width: 44, height: 44, objectFit: "contain", borderRadius: "50%", boxShadow: "0 4px 12px rgba(0,0,0,0.12)", transition: "all 0.3s ease" }} 
+            onMouseEnter={e => e.currentTarget.style.transform = "scale(1.1)"}
+            onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
+          />
+          <div style={{ fontWeight: '800', fontSize: '18px', color: '#fff' }}>InterviewAce</div>
+        </div>
         <ProgressTracker
           total={totalQuestions}
           current={currentIndex + 1}

@@ -106,6 +106,12 @@ const InterviewFeedback = () => {
     <div className="feedback-container">
       {/* HEADER */}
       <div className="feedback-header">
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: "20px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} onClick={() => navigate("/")}>
+            <img src="/logo.png" alt="Logo" style={{ width: 50, height: 50, objectFit: "contain", borderRadius: "50%", boxShadow: "0 2px 10px rgba(0,0,0,0.1)" }} />
+            <div style={{ fontWeight: '800', fontSize: '24px', color: '#3b82f6' }}>InterviewAce</div>
+          </div>
+        </div>
         <h1>🎉 Interview Complete!</h1>
         <p className="header-subtitle">
           Here's your performance summary and feedback

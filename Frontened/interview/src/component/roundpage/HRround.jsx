@@ -74,6 +74,10 @@ const navigate=useNavigate();
   return (
     <div>
     <div className="interview-container-5">
+      <div style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer", marginBottom: "20px", justifyContent: "center" }} onClick={() => navigate("/")}>
+        <img src="/logo.png" alt="Logo" style={{ width: 48, height: 48, objectFit: "cover", borderRadius: "50%", boxShadow: "0 4px 15px rgba(0,0,0,0.1)" }} />
+        <div style={{ fontWeight: '800', fontSize: '24px', color: '#1a1a2e', letterSpacing: '-0.5px' }}>InterviewAce</div>
+      </div>
       <h1 className="title-5">Choose Your Interview Mode</h1>
       <p className="subtitle-5">
         Select the interview type that matches your career stage and goals. Our

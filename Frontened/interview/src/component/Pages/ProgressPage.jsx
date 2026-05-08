@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // ─── DATA ────────────────────────────────────────────────────────────────────
 
@@ -323,10 +324,109 @@ function SubjectsTab() {
             style={{width:"100%",padding:"9px 12px 9px 36px",border:"1.5px solid #e8eaed",
               borderRadius:9,fontSize:13,fontFamily:"inherit",outline:"none",boxSizing:"border-box"}}/>
         </div>
-        import React, { useState } from "react";
-        // ...existing code from the latest version...
-        // (Paste the complete, latest, and correct implementation here, as per your requirements)
-        // ...existing code...
+        <div style={{display:"flex",gap:5}}>
+          {["All","Easy","Medium","Hard"].map(f=>(
+            <button key={f} onClick={()=>setDiff(f)}
+              style={{padding:"8px 14px",borderRadius:8,border:diff===f?"none":"1.5px solid #e8eaed",
+                background:diff===f?"#1a73e8":"#fff",color:diff===f?"#fff":"#5f6368",
+                fontWeight:diff===f?700:500,fontSize:12,cursor:"pointer",transition:"all .2s"}}>
+              {f}
+            </button>
+          ))}
+        </div>
+        <select value={sortBy} onChange={e=>setSortBy(e.target.value)}
+          style={{padding:"9px 12px",border:"1.5px solid #e8eaed",borderRadius:9,
+            fontSize:12,fontFamily:"inherit",background:"#fff",color:"#3c4043",cursor:"pointer"}}>
+          {["Default","Progress ↓","Progress ↑","Score ↓","Name A-Z"].map(o=><option key={o}>{o}</option>)}
+        </select>
+        <span style={{fontSize:12,color:"#9aa0a6"}}>{totalFiltered} subjects</span>
+      </div>
+
+      {/* Core Section */}
+      {filteredCore.length > 0 && (
+        <div>
+          <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
+            <div style={{width:4,height:24,background:"#1a73e8",borderRadius:99}}/>
+            <h3 style={{margin:0,fontSize:15,fontWeight:800,color:"#1a1a2e"}}>Core Engineering Subjects</h3>
+            <span style={{background:"#e8f0fe",color:"#1a73e8",fontSize:11,fontWeight:700,
+              padding:"2px 10px",borderRadius:99}}>{filteredCore.length}</span>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:16}}>
+            {filteredCore.map(s=><SubjectMiniCard key={s.id} s={s}/>)}
+          </div>
+        </div>
+      )}
+
+      {/* Specialization Section */}
+      {filteredSpec.length > 0 && (
+        <div>
+          <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
+            <div style={{width:4,height:24,background:"#9334ea",borderRadius:99}}/>
+            <h3 style={{margin:0,fontSize:15,fontWeight:800,color:"#1a1a2e"}}>Specialization & Programming</h3>
+            <span style={{background:"#f3e8fd",color:"#9334ea",fontSize:11,fontWeight:700,
+              padding:"2px 10px",borderRadius:99}}>{filteredSpec.length}</span>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:16}}>
+            {filteredSpec.map(s=><SubjectMiniCard key={s.id} s={s}/>)}
+          </div>
+        </div>
+      )}
+
+      {totalFiltered === 0 && (
+        <div style={{textAlign:"center",padding:"60px 20px",color:"#9aa0a6"}}>
+          <div style={{fontSize:40,marginBottom:12}}>🔍</div>
+          <div style={{fontSize:18,fontWeight:700,color:"#3c4043",marginBottom:6}}>No subjects found</div>
+          <button onClick={()=>{setSearch("");setDiff("All");}}
+            style={{background:"#1a73e8",color:"#fff",border:"none",borderRadius:9,
+              padding:"10px 24px",fontWeight:700,fontSize:13,cursor:"pointer",marginTop:12}}>
+            Clear Filters
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── TAB: INTERVIEW HISTORY ───────────────────────────────────────────────────
+
+function InterviewHistoryTab() {
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:16}}>
+      {interviews.map(iv=>(
+        <div key={iv.id} style={{background:"#fff",borderRadius:16,padding:22,
+          border:"1px solid #e8eaed",display:"flex",alignItems:"center",gap:20,flexWrap:"wrap"}}>
+          <ScoreCircle score={iv.score} size={70} stroke={6}/>
+          <div style={{flex:1,minWidth:200}}>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6,flexWrap:"wrap"}}>
+              <span style={{fontWeight:700,fontSize:15,color:"#1a1a2e"}}>{iv.type}</span>
+              <GradeBadge grade={iv.grade} />
+              <Badge label="✓ Completed" textColor="#1e8e3e" bgColor="#e6f4ea"/>
+            </div>
+            <div style={{fontSize:13,color:"#5f6368"}}>{iv.mode}</div>
+            <div style={{display:"flex",gap:20,marginTop:10,flexWrap:"wrap"}}>
+              {[["📅",iv.date],["❓",`${iv.questions} Qs`],["⏱",iv.time],["📝",`${iv.avgLen}w avg`]].map(([ic,v])=>(
+                <div key={ic}><div style={{fontSize:10,color:"#9aa0a6"}}>{ic}</div>
+                <div style={{fontSize:13,fontWeight:600,color:"#3c4043",marginTop:1}}>{v}</div></div>
+              ))}
+            </div>
+          </div>
+          <button style={{background:"#e8f0fe",color:"#1a73e8",border:"none",borderRadius:9,
+            padding:"10px 20px",fontWeight:700,cursor:"pointer",fontSize:13,whiteSpace:"nowrap"}}
+            onMouseEnter={e=>e.currentTarget.style.background="#d2e3fc"}
+            onMouseLeave={e=>e.currentTarget.style.background="#e8f0fe"}>
+            View Details
+          </button>
+        </div>
+      ))}
+      <div style={{display:"flex",justifyContent:"center",marginTop:8}}>
+        <button style={{background:"#1a73e8",color:"#fff",border:"none",borderRadius:11,
+          padding:"13px 34px",fontWeight:700,cursor:"pointer",fontSize:14}}
+          onMouseEnter={e=>e.currentTarget.style.background="#1558b0"}
+          onMouseLeave={e=>e.currentTarget.style.background="#1a73e8"}>
+          Start New Interview Round →
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -433,7 +533,14 @@ function AchievementsTab() {
 // ─── MAIN PAGE ────────────────────────────────────────────────────────────────
 
 export default function ProgressPage() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("Overview");
+
+  const handleLogout = () => {
+    localStorage.clear();
+    alert("Logout successful");
+    navigate("/login", { replace: true });
+  };
 
   const totalQ   = allSubjects.reduce((a,b)=>a+b.total,0);
   const doneQ    = allSubjects.reduce((a,b)=>a+b.completed,0);
@@ -442,7 +549,6 @@ export default function ProgressPage() {
   const started  = allSubjects.filter(s=>s.progress>0).length;
 
   return (
-<<<<<<< Updated upstream
     <div style={{fontFamily:"'Sora',sans-serif",background:"#f0f4ff",minHeight:"100vh"}}>
 
       {/* NAVBAR */}
@@ -450,7 +556,10 @@ export default function ProgressPage() {
         padding:"0 32px",display:"flex",alignItems:"center",justifyContent:"space-between",
         position:"sticky",top:0,zIndex:200}}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} onClick={() => navigate && navigate("/")}>
-          <img src="/logo.png" alt="Logo" style={{ width: 40, height: 40, objectFit: "contain", borderRadius: "50%", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }} />
+          <img src="/logo.png" alt="Logo" style={{ width: 44, height: 44, objectFit: "cover", borderRadius: "50%", boxShadow: "0 4px 12px rgba(0,0,0,0.12)", transition: "all 0.3s ease" }} 
+            onMouseEnter={e => e.currentTarget.style.transform = "scale(1.1)"}
+            onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
+          />
           <div style={{fontWeight:800,fontSize:20,color:"#1a1a2e",letterSpacing:-0.5}}>InterviewAce</div>
         </div>
         <div style={{display:"flex",gap:28,fontSize:15}}>
@@ -471,9 +580,6 @@ export default function ProgressPage() {
           onMouseEnter={e=>e.currentTarget.style.background="#1558b0"}
           onMouseLeave={e=>e.currentTarget.style.background="#1a73e8"}>Logout</button>
       </nav>
-=======
-    <div style={{fontFamily:"'Sora',sans-serif",background:"var(--bg-page)",minHeight:"100vh",color:"var(--text-main)"}}>
->>>>>>> Stashed changes
 
       <div style={{maxWidth:1150,margin:"0 auto",padding:"36px 20px 72px"}}>
 
