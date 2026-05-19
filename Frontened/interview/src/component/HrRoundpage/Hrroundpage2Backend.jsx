@@ -23,8 +23,8 @@ const Hrroundpage2Backend = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [totalQuestions, setTotalQuestions] = useState(0);
   const [maxQuestions, setMaxQuestions] = useState(initialMaxQuestions || 10);
-  const [interviewUsingFallback, setInterviewUsingFallback] = useState(usingFallback || false);
-  const [interviewLanguage, setInterviewLanguage] = useState(language);
+  const [interviewUsingFallback] = useState(usingFallback || false);
+  const [interviewLanguage] = useState(language);
 
   // ✅ Initialize interview
   useEffect(() => {

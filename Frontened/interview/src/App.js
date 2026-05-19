@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from "react-router-dom";
+import { ThemeProvider } from "./context/ThemeContext";
 import Navbar from "./component/Navbar/Navbar";
 import Footer from "./component/footer/Footer";
 import Login from "./component/signuppage/Login";
@@ -17,19 +18,14 @@ import TestPage from "./component/Pages/Test";
 import Scrolltotop from "./component/Scrolltotop";
 import Hrroundpage1 from "./component/HrRoundpage/Hrroundpage1";
 import Hrroundpage2Backend from "./component/HrRoundpage/Hrroundpage2Backend";
+import VoiceInterview from "./component/HrRoundpage/VoiceInterview";
 import InterviewFeedback from "./component/HrRoundpage/InterviewFeedback";
 import ProctoringWrapper from "./component/ProctoringWrapper";
 import SecurityWrapper from "./component/SecurityWrapper";
 
-
-// Test-only routes jahan security lock active hoga
-const TEST_ROUTES = ["/aptitude", "/hr-aptitude", "/technical-round", "/test", "/hr-round-1", "/hr-round-2"];
-
 const AppContent = () => {
   const location = useLocation();
   const hideGlobalNavbar = location.pathname === "/login" || location.pathname === "/progress" || location.pathname === "/subjects" || location.pathname === "/dashboard" || location.pathname === "/technical-round" || location.pathname === "/test" || location.pathname === "/aptitude" || location.pathname === "/hr-aptitude" || location.pathname === "/proctoring";
-
-  const isTestRoute = TEST_ROUTES.includes(location.pathname);
 
   const content = (
     <>
@@ -40,9 +36,11 @@ const AppContent = () => {
         <Route
           path="/"
           element={
-            <Privateroute>
+            localStorage.getItem("token") ? (
               <Home />
-            </Privateroute>
+            ) : (
+              <Navigate to="/login" replace />
+            )
           }
         />
         <Route
@@ -145,6 +143,14 @@ const AppContent = () => {
           }
         />
         <Route
+          path="/voice-interview"
+          element={
+            <Privateroute>
+              <VoiceInterview />
+            </Privateroute>
+          }
+        />
+        <Route
           path="/proctoring"
           element={
             <Privateroute>
@@ -163,9 +169,11 @@ const AppContent = () => {
 
 const App = () => {
   return (
-    <Router>
-      <AppContent />
-    </Router>
+    <ThemeProvider>
+      <Router>
+        <AppContent />
+      </Router>
+    </ThemeProvider>
   );
 };
 

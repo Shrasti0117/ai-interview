@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../../context/ThemeContext";
+import Navbar from "../Navbar/Navbar";
 
 // ─── REUSABLE COMPONENTS ─────────────────────────────────────────────────────
 
@@ -43,9 +45,9 @@ function SubjectMiniCard({ title, progress, color, icon, onClick }) {
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { isDarkMode } = useTheme();
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState("");
-  const [hoveredNav, setHoveredNav] = useState(null);
 
   useEffect(() => {
     const savedTasks = JSON.parse(localStorage.getItem("plannerTasks")) || [
@@ -74,37 +76,12 @@ export default function Dashboard() {
     setNewTask("");
   };
 
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/login");
-  };
+  const bgColor = isDarkMode ? "#1a1a2e" : "#f0f4ff";
 
   return (
-    <div style={{ background: "#f0f4ff", minHeight: "100vh", fontFamily: "'Sora', sans-serif" }}>
+    <div style={{ background: bgColor, minHeight: "100vh", fontFamily: "'Sora', sans-serif", transition: "background 0.3s ease" }}>
       
-      {/* Navbar */}
-      <nav style={{ background: "#fff", borderBottom: "1px solid #e8eaed", height: 62, padding: "0 32px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 500 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} onClick={() => navigate("/")}>
-          <img src="/logo.png" alt="Logo" style={{ width: 42, height: 42, objectFit: "cover", borderRadius: "50%", boxShadow: "0 4px 12px rgba(0,0,0,0.12)", transition: "all 0.3s ease" }} 
-            onMouseEnter={e => e.currentTarget.style.transform = "scale(1.1)"}
-            onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
-          />
-          <div style={{ fontWeight: 800, fontSize: 20, color: "#1a73e8" }}>InterviewAce</div>
-        </div>
-        <div style={{ display: "flex", gap: 32, height: "100%" }}>
-          {["Home", "Dashboard", "Subjects", "Progress", "Interview Rounds", "Test"].map(n => (
-            <div key={n} 
-              onMouseEnter={() => setHoveredNav(n)}
-              onMouseLeave={() => setHoveredNav(null)}
-              onClick={() => navigate(n === "Home" ? "/" : `/${n.toLowerCase().replace(' ', '-')}`)}
-              style={{ display: "flex", alignItems: "center", height: "100%", padding: "0 4px", fontSize: 14, fontWeight: (n === "Dashboard") ? 700 : 500, color: (n === "Dashboard" || hoveredNav === n) ? "#1a73e8" : "#5f6368", borderBottom: (n === "Dashboard") ? "2px solid #1a73e8" : "2px solid transparent", cursor: "pointer", transition: "0.2s" }}
-            >
-              {n}
-            </div>
-          ))}
-        </div>
-        <button onClick={handleLogout} style={{ background: "#1a73e8", color: "#fff", border: "none", borderRadius: 9, padding: "8px 22px", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>Logout</button>
-      </nav>
+      <Navbar />
 
       <div style={{ maxWidth: 1150, margin: "0 auto", padding: "36px 20px 80px" }}>
         

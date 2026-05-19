@@ -1,19 +1,15 @@
 import React from 'react'
 import './navbar.css'
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import ProfileSidebar from '../ProfileSidebar/ProfileSidebar';
+import { useTheme } from '../../context/ThemeContext';
 
 const Navbar = () => {
-  const navigate = useNavigate();
+  const { isDarkMode } = useTheme();
 
-  const handleLogout = () => {
-    localStorage.clear();
-    alert("Logout successful");
-    navigate("/login", { replace: true });
-  };
   return (
-       <div className="home-container">
-         
-      <nav className="navbar">
+    <div className={`home-container ${isDarkMode ? 'dark-mode' : ''}`}>
+      <nav className={`navbar ${isDarkMode ? 'dark-mode' : ''}`}>
         <div className="logo-section">
           <img src="/logo.png" alt="InterviewAce Logo" className="logo" />
           <h1 className="brand-name">InterviewAce</h1>
@@ -26,9 +22,9 @@ const Navbar = () => {
           <li><Link to="/interview-rounds">Interview Rounds</Link></li>
           <li><Link to="/test">Test</Link></li>
         </ul>
-      <button className='login_btn' onClick={handleLogout}>Logout</button>
+        <ProfileSidebar />
       </nav>
-      </div>
+    </div>
   )
 }
 

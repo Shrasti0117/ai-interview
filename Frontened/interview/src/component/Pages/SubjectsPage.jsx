@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../../context/ThemeContext";
+import ProfileSidebar from "../ProfileSidebar/ProfileSidebar";
 
 /* ═══════════════════════════════════════════════════════════════════
    INTERVIEWACE — Complete Frontend
@@ -10,6 +12,9 @@ import { useNavigate } from "react-router-dom";
 
 const API_BASE = "http://localhost:5001/api";   // Updated to match project backend port
 
+// ────────────────────────────────────────────────────────────────────
+// GLOBAL STYLES  (injected once)
+// ────────────────────────────────────────────────────────────────────
 // ────────────────────────────────────────────────────────────────────
 // GLOBAL STYLES  (injected once)
 // ────────────────────────────────────────────────────────────────────
@@ -31,13 +36,175 @@ const GLOBAL_CSS = `
   ::-webkit-scrollbar-track{background:#f0f4ff}
   ::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
   
-  /* Responsive Adjustments */
-  @media (max-width: 768px) {
-    .stats-grid { grid-template-columns: 1fr 1fr !important; }
-    .subject-row { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
-    .subject-row-progress { width: 100% !important; justify-content: space-between !important; }
-    .topic-grid { grid-template-columns: 1fr !important; }
+  /* 📱 Phone Responsive: up to 767px */
+  @media (max-width: 767px) {
+    body{font-size:14px}
+    h1{font-size:20px !important}
+    h2{font-size:16px !important}
+    h3{font-size:14px !important}
+    p{font-size:12px !important}
+    
+    .stats-grid { grid-template-columns: 1fr 1fr !important; gap: 10px !important; padding: 0 8px !important; }
+    .subject-row { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; padding: 12px 14px !important; }
+    .subject-row-progress { width: 100% !important; justify-content: space-between !important; flex-wrap: wrap !important; }
+    .topic-grid { grid-template-columns: 1fr !important; gap: 10px !important; }
     .navbar-links { display: none !important; }
+    
+    /* Navbar adjustments */
+    nav { padding: 0 12px !important; height: 50px !important; }
+    
+    /* Card and container adjustments */
+    [style*="maxWidth: 1100"] { padding: 16px 12px !important; }
+    [style*="maxWidth: 720"] { padding: 16px 12px !important; }
+    [style*="maxWidth: 700"] { padding: 16px 12px !important; }
+    [style*="maxWidth: 600"] { padding: 16px 12px !important; }
+    [style*="maxWidth: 490"] { padding: 20px 16px !important; }
+    
+    /* Button and input adjustments */
+    button { font-size: 12px !important; padding: 8px 12px !important; }
+    input { font-size: 12px !important; padding: 8px 10px !important; }
+    
+    /* Filter bar flex wrap */
+    [style*="display: flex"] [style*="gap: 12px"] { flex-wrap: wrap !important; }
+  }
+  
+  /* 📲 Tablet Responsive: 768px – 1023px */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    body{font-size:14px}
+    h1{font-size:22px !important}
+    h2{font-size:17px !important}
+    h3{font-size:15px !important}
+    p{font-size:13px !important}
+    
+    .stats-grid { grid-template-columns: 1fr 1fr !important; gap: 12px !important; }
+    .subject-row { gap: 14px !important; padding: 16px 18px !important; }
+    .subject-row-progress { width: 100% !important; }
+    .topic-grid { grid-template-columns: 1fr 1fr !important; gap: 12px !important; }
+    .navbar-links { display: flex !important; gap: 12px !important; font-size: 12px !important; }
+    
+    /* Container padding */
+    [style*="maxWidth: 1100"] { padding: 24px 18px !important; }
+    [style*="maxWidth: 720"] { padding: 20px 16px !important; }
+    [style*="maxWidth: 700"] { padding: 20px 16px !important; }
+    
+    /* Button adjustments */
+    button { font-size: 13px !important; padding: 10px 14px !important; }
+    input { font-size: 13px !important; padding: 10px 12px !important; }
+  }
+  
+  /* 💻 Desktop Responsive: 1024px and above */
+  @media (min-width: 1024px) {
+    body{font-size:15px}
+    h1{font-size:28px !important}
+    h2{font-size:19px !important}
+    h3{font-size:16px !important}
+    p{font-size:14px !important}
+    
+    .stats-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 14px !important; }
+    .subject-row { gap: 16px !important; padding: 18px 20px !important; }
+    .subject-row-progress { width: auto !important; }
+    .topic-grid { grid-template-columns: 1fr 1fr !important; gap: 14px !important; }
+    .navbar-links { display: flex !important; gap: 8px !important; font-size: 14px !important; }
+    
+    /* Container padding */
+    [style*="maxWidth: 1100"] { padding: 32px 24px !important; }
+    [style*="maxWidth: 720"] { padding: 24px 20px !important; }
+    [style*="maxWidth: 700"] { padding: 24px 20px !important; }
+  }
+`;
+
+const GLOBAL_CSS_DARK = `
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0}
+  button{font-family:inherit;cursor:pointer}
+  input{font-family:inherit;background:#16213e;color:#e0e0e0;border:1px solid #2d3561;padding:8px 12px;border-radius:6px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+  .fade-in{animation:fadeIn .35s ease both}
+  .slide-up{animation:slideUp .4s ease both}
+  .spin{animation:spin 1s linear infinite}
+  .row-hover{transition:all .2s}
+  .row-hover:hover{transform:translateX(3px)}
+  ::-webkit-scrollbar{width:6px}
+  ::-webkit-scrollbar-track{background:#1a1a2e}
+  ::-webkit-scrollbar-thumb{background:#2d3561;border-radius:3px}
+  
+  /* 📱 Phone Responsive: up to 767px */
+  @media (max-width: 767px) {
+    body{font-size:14px}
+    h1{font-size:20px !important}
+    h2{font-size:16px !important}
+    h3{font-size:14px !important}
+    p{font-size:12px !important}
+    
+    .stats-grid { grid-template-columns: 1fr 1fr !important; gap: 10px !important; padding: 0 8px !important; }
+    .subject-row { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; padding: 12px 14px !important; }
+    .subject-row-progress { width: 100% !important; justify-content: space-between !important; flex-wrap: wrap !important; }
+    .topic-grid { grid-template-columns: 1fr !important; gap: 10px !important; }
+    .navbar-links { display: none !important; }
+    
+    /* Navbar adjustments */
+    nav { padding: 0 12px !important; height: 50px !important; }
+    
+    /* Card and container adjustments */
+    [style*="maxWidth: 1100"] { padding: 16px 12px !important; }
+    [style*="maxWidth: 720"] { padding: 16px 12px !important; }
+    [style*="maxWidth: 700"] { padding: 16px 12px !important; }
+    [style*="maxWidth: 600"] { padding: 16px 12px !important; }
+    [style*="maxWidth: 490"] { padding: 20px 16px !important; }
+    
+    /* Button and input adjustments */
+    button { font-size: 12px !important; padding: 8px 12px !important; }
+    input { font-size: 12px !important; padding: 8px 10px !important; }
+    
+    /* Filter bar flex wrap */
+    [style*="display: flex"] [style*="gap: 12px"] { flex-wrap: wrap !important; }
+  }
+  
+  /* 📲 Tablet Responsive: 768px – 1023px */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    body{font-size:14px}
+    h1{font-size:22px !important}
+    h2{font-size:17px !important}
+    h3{font-size:15px !important}
+    p{font-size:13px !important}
+    
+    .stats-grid { grid-template-columns: 1fr 1fr !important; gap: 12px !important; }
+    .subject-row { gap: 14px !important; padding: 16px 18px !important; }
+    .subject-row-progress { width: 100% !important; }
+    .topic-grid { grid-template-columns: 1fr 1fr !important; gap: 12px !important; }
+    .navbar-links { display: flex !important; gap: 12px !important; font-size: 12px !important; }
+    
+    /* Container padding */
+    [style*="maxWidth: 1100"] { padding: 24px 18px !important; }
+    [style*="maxWidth: 720"] { padding: 20px 16px !important; }
+    [style*="maxWidth: 700"] { padding: 20px 16px !important; }
+    
+    /* Button adjustments */
+    button { font-size: 13px !important; padding: 10px 14px !important; }
+    input { font-size: 13px !important; padding: 10px 12px !important; }
+  }
+  
+  /* 💻 Desktop Responsive: 1024px and above */
+  @media (min-width: 1024px) {
+    body{font-size:15px}
+    h1{font-size:28px !important}
+    h2{font-size:19px !important}
+    h3{font-size:16px !important}
+    p{font-size:14px !important}
+    
+    .stats-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 14px !important; }
+    .subject-row { gap: 16px !important; padding: 18px 20px !important; }
+    .subject-row-progress { width: auto !important; }
+    .topic-grid { grid-template-columns: 1fr 1fr !important; gap: 14px !important; }
+    .navbar-links { display: flex !important; gap: 8px !important; font-size: 14px !important; }
+    
+    /* Container padding */
+    [style*="maxWidth: 1100"] { padding: 32px 24px !important; }
+    [style*="maxWidth: 720"] { padding: 24px 20px !important; }
+    [style*="maxWidth: 700"] { padding: 24px 20px !important; }
   }
 `;
 
@@ -322,12 +489,21 @@ function getMockQuestions(topic) {
 // ────────────────────────────────────────────────────────────────────
 async function apiFetchQuestions(subjectCode, topic, limit=10) {
   try {
+    const token = localStorage.getItem("token");
     const params = new URLSearchParams({ topic, limit });
-    const res = await fetch(`${API_BASE}/subjects/${subjectCode}/questions?${params}`, { signal: AbortSignal.timeout(4000) });
-    if (!res.ok) throw new Error("API error");
+    const res = await fetch(`${API_BASE}/subjects/${subjectCode}/questions?${params}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      signal: AbortSignal.timeout(4000)
+    });
+    if (!res.ok) throw new Error(`API error: ${res.status}`);
     const data = await res.json();
-    return (data.questions || data).slice(0, limit);
-  } catch {
+    return (data.questions || data || []).slice(0, limit);
+  } catch (err) {
+    console.log("Failed to fetch questions from database:", err.message);
     return getMockQuestions(topic).slice(0, limit);
   }
 }
@@ -407,6 +583,7 @@ function Spinner({ color="#2563eb" }) {
 // ────────────────────────────────────────────────────────────────────
 function Navbar({ view, onNavigate, onLogout }) {
   const navigate = useNavigate();
+  const { isDarkMode } = useTheme();
   const links = ["Home","Dashboard","Subjects","Progress","Interview Rounds","Test"];
   
   const handleNav = (n) => {
@@ -414,25 +591,30 @@ function Navbar({ view, onNavigate, onLogout }) {
     else navigate(n === "Home" ? "/" : `/${n.toLowerCase().replace(' ', '-')}`);
   };
 
+  const bgColor = isDarkMode ? "#16213e" : "#fff";
+  const borderColor = isDarkMode ? "#2d3561" : "#e5e7eb";
+  const textColor = isDarkMode ? "#e0e0e0" : "#555";
+  const primaryColor = "#2563eb";
+
   return (
-    <nav style={{background:"#fff",borderBottom:"1px solid #e5e7eb",padding:"0 28px",display:"flex",alignItems:"center",justifyContent:"space-between",height:60,position:"sticky",top:0,zIndex:200,boxShadow:"0 1px 4px rgba(0,0,0,.06)"}}>
+    <nav style={{background:bgColor,borderBottom:`1px solid ${borderColor}`,padding:"0 28px",display:"flex",alignItems:"center",justifyContent:"space-between",height:60,position:"sticky",top:0,zIndex:200,boxShadow:"0 1px 4px rgba(0,0,0,.06)",transition:"all 0.3s ease"}}>
       <div style={{display:"flex",alignItems:"center",gap:10, cursor: "pointer"}} onClick={() => navigate("/")}>
           <img src="/logo.png" alt="Logo" style={{ width: 44, height: 44, objectFit: "cover", borderRadius: "50%", boxShadow: "0 4px 12px rgba(0,0,0,0.12)", transition: "all 0.3s ease" }} 
             onMouseEnter={e => e.currentTarget.style.transform = "scale(1.1)"}
             onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
           />
-        <span style={{fontWeight:900,fontSize:19,color:"#111",letterSpacing:-.3}}>InterviewAce</span>
+        <span style={{fontWeight:900,fontSize:19,color:isDarkMode?"#e0e0e0":"#111",letterSpacing:-.3,transition:"color 0.3s ease"}}>InterviewAce</span>
       </div>
       <div className="navbar-links" style={{display:"flex",gap:6}}>
         {links.map(n=>(
           <button key={n} onClick={()=>handleNav(n)}
-            style={{background:"none",border:"none",fontSize:14,color:(n==="Subjects" && view!=="dashboard")?"#2563eb":"#555",fontWeight:(n==="Subjects" && view!=="dashboard")?700:500,cursor:"pointer",padding:"6px 12px",borderRadius:8,borderBottom:(n==="Subjects" && view!=="dashboard")?"2px solid #2563eb":"2px solid transparent",transition:"all .15s"}}
-            onMouseOver={e=>{if(n!=="Subjects")e.currentTarget.style.background="#f3f4f6"}}
+            style={{background:"none",border:"none",fontSize:14,color:(n==="Subjects" && view!=="dashboard")?primaryColor:textColor,fontWeight:(n==="Subjects" && view!=="dashboard")?700:500,cursor:"pointer",padding:"6px 12px",borderRadius:8,borderBottom:(n==="Subjects" && view!=="dashboard")?`2px solid ${primaryColor}`:"2px solid transparent",transition:"all .15s"}}
+            onMouseOver={e=>{if(n!=="Subjects")e.currentTarget.style.background=isDarkMode?"#2d3561":"#f3f4f6"}}
             onMouseOut={e=>e.currentTarget.style.background="none"}
           >{n}</button>
         ))}
       </div>
-      <button onClick={onLogout} style={{background:"#2563eb",color:"#fff",border:"none",padding:"8px 22px",borderRadius:9,fontWeight:700,fontSize:14}}>Logout</button>
+      <ProfileSidebar />
     </nav>
   );
 }
@@ -725,19 +907,16 @@ function TopicSelectorPage({ subject, onSelectTopic, onBack }) {
 }
 
 // ────────────────────────────────────────────────────────────────────
-// MCQ PRACTICE PAGE  (the main practice screen)
+// MCQ PRACTICE PAGE  (NEW: Sidebar + No timer + Comprehensive Results)
 // ────────────────────────────────────────────────────────────────────
 function MCQPracticePage({ subject, topic, onBack, onFinish }) {
   const [questions, setQuestions] = useState([]);
-  const [loading, setLoading]     = useState(true);
-  const [current, setCurrent]     = useState(0);
-  const [selected, setSelected]   = useState(null);
-  const [answered, setAnswered]   = useState(false);
-  const [score, setScore]         = useState(0);
-  const [timeLeft, setTimeLeft]   = useState(30);
-  const [finished, setFinished]   = useState(false);
-  const [results, setResults]     = useState([]);
-  const [showExplain, setShowExplain] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [current, setCurrent] = useState(0);
+  const [answers, setAnswers] = useState({});
+  const [visited, setVisited] = useState({});
+  const [finished, setFinished] = useState(false);
+  const [totalTime, setTotalTime] = useState(600); // 10 minutes
   const timerRef = useRef(null);
 
   // Load questions
@@ -746,39 +925,40 @@ function MCQPracticePage({ subject, topic, onBack, onFinish }) {
     apiFetchQuestions(subject.code, topic, 10).then(qs=>{setQuestions(qs);setLoading(false);});
   },[subject.code, topic]);
 
-  // Timer
+  // Total timer (10 min for entire quiz)
   useEffect(()=>{
-    if(loading || answered || finished || questions.length===0) return;
+    if(loading || finished || questions.length===0) return;
     timerRef.current = setInterval(()=>{
-      setTimeLeft(t=>{
-        if(t<=1){ clearInterval(timerRef.current); handleAnswer(null,true); return 0; }
+      setTotalTime(t=>{
+        if(t<=1){ clearInterval(timerRef.current); handleFinish(); return 0; }
         return t-1;
       });
     },1000);
     return ()=>clearInterval(timerRef.current);
-  },[loading, current, answered, finished, questions.length]);
+  },[loading, finished, questions.length]);
 
-  const handleAnswer = useCallback((label, timeout=false)=>{
+  const handleAnswer = (idx, label)=>{
+    setAnswers(a=>({...a,[idx]:label}));
+    setVisited(v=>({...v,[idx]:true}));
+    recordLocalProgress(subject.code, topic, label===questions[idx].correct);
+    apiSubmitAnswer(subject.code, questions[idx]._id, label, label===questions[idx].correct);
+  };
+
+  const goToQuestion = (idx)=>{
+    setCurrent(idx);
+    setVisited(v=>({...v,[idx]:true}));
+  };
+
+  const handleFinish = ()=>{
     clearInterval(timerRef.current);
-    if(answered) return;
-    const q = questions[current];
-    const correct = !timeout && label===q.correct;
-    setSelected(timeout ? null : label);
-    setAnswered(true);
-    setShowExplain(false);
-    if(correct) setScore(s=>s+1);
-    recordLocalProgress(subject.code, topic, correct);
-    apiSubmitAnswer(subject.code, q._id, label, correct);
-    setResults(r=>[...r,{
-      question:q.question, selected:timeout?"⏰ Timed out":label,
-      correct:q.correct, isCorrect:correct,
-      explanation:q.explanation, difficulty:q.difficulty
-    }]);
-  },[answered, current, questions, subject.code, topic]);
+    setFinished(true);
+  };
 
-  const nextQuestion = ()=>{
-    if(current+1>=questions.length){ setFinished(true); return; }
-    setCurrent(c=>c+1); setSelected(null); setAnswered(false); setTimeLeft(30); setShowExplain(false);
+  const handleRetry = ()=>{
+    setAnswers({});
+    setCurrent(0);
+    setTotalTime(600);
+    setFinished(false);
   };
 
   // ── LOADING ──
@@ -791,165 +971,298 @@ function MCQPracticePage({ subject, topic, onBack, onFinish }) {
 
   // ── RESULTS SCREEN ──
   if(finished){
+    const answeredCount = Object.keys(answers).length;
+    const results = questions.map((q, i)=>{
+      const userAnswer = answers[i];
+      const isCorrect = userAnswer === q.correct;
+      return { q, userAnswer, isCorrect };
+    });
+    const score = results.filter(r=>r.isCorrect).length;
     const pct = Math.round((score/questions.length)*100);
-    const grade = pct>=80?"🏆 Excellent!":pct>=60?"👍 Good Job!":pct>=40?"📖 Keep Practicing":"💪 Don't Give Up!";
+    const byDifficulty = {Easy:0, Medium:0, Hard:0, correctEasy:0, correctMedium:0, correctHard:0};
+    results.forEach(r=>{
+      const diff = r.q.difficulty || "Medium";
+      byDifficulty[diff]++;
+      if(r.isCorrect) byDifficulty[`correct${diff}`]++;
+    });
+    const grade = pct>=80?"🏆 Excellent!":pct>=60?"👍 Good Job!":pct>=40?"📖 Keep Practicing":"💪 Keep Trying!";
+
     return (
-      <div className="fade-in" style={{minHeight:"100vh",background:"#f0f4ff",padding:"32px 20px"}}>
-        <div style={{maxWidth:600,margin:"0 auto"}}>
+      <div className="fade-in" style={{minHeight:"100vh",background:"#f0f4ff",padding:"24px 20px"}}>
+        <div style={{maxWidth:900,margin:"0 auto"}}>
           {/* Result header */}
-          <div style={{background:"#fff",borderRadius:24,padding:"40px 30px",textAlign:"center",boxShadow:"0 10px 30px rgba(0,0,0,.05)",border:"1px solid #e5e7eb",marginBottom:24}}>
-            <div style={{fontSize:50,marginBottom:16}}>🏁</div>
-            <h1 style={{fontSize:26,fontWeight:900,marginBottom:8}}>{grade}</h1>
-            <p style={{color:"#888",marginBottom:30}}>You completed the <b>{topic}</b> assessment.</p>
+          <div style={{background:"#fff",borderRadius:20,padding:"40px 30px",textAlign:"center",boxShadow:"0 10px 30px rgba(0,0,0,.05)",border:"1px solid #e5e7eb",marginBottom:24}}>
+            <h1 style={{fontSize:26,fontWeight:900,marginBottom:12}}>{grade}</h1>
+            <p style={{color:"#888",marginBottom:28}}>Quiz Complete: <b>{topic}</b> from <b>{subject.name}</b></p>
             
-            <div style={{display:"flex",justifyContent:"center",gap:24,marginBottom:32}}>
-              <div style={{textAlign:"center"}}>
-                <div style={{fontSize:32,fontWeight:900,color:subject.color}}>{score}/{questions.length}</div>
-                <div style={{fontSize:12,color:"#aaa",fontWeight:700,letterSpacing:.5,marginTop:2}}>SCORE</div>
+            {/* Score metrics */}
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:16,marginBottom:28}}>
+              <div style={{background:"#f8f9fa",borderRadius:16,padding:"20px"}}>
+                <div style={{fontSize:11,color:"#888",fontWeight:700,letterSpacing:.5,marginBottom:8}}>SCORE</div>
+                <div style={{fontSize:36,fontWeight:900,color:subject.color}}>{score}/{questions.length}</div>
               </div>
-              <div style={{width:1,height:40,background:"#e5e7eb",alignSelf:"center"}}/>
-              <div style={{textAlign:"center"}}>
-                <div style={{fontSize:32,fontWeight:900,color:pct>=60?"#16a34a":"#dc2626"}}>{pct}%</div>
-                <div style={{fontSize:12,color:"#aaa",fontWeight:700,letterSpacing:.5,marginTop:2}}>ACCURACY</div>
+              <div style={{background:"#f8f9fa",borderRadius:16,padding:"20px"}}>
+                <div style={{fontSize:11,color:"#888",fontWeight:700,letterSpacing:.5,marginBottom:8}}>ACCURACY</div>
+                <div style={{fontSize:36,fontWeight:900,color:pct>=60?"#16a34a":"#dc2626"}}>{pct}%</div>
+              </div>
+              <div style={{background:"#f8f9fa",borderRadius:16,padding:"20px"}}>
+                <div style={{fontSize:11,color:"#888",fontWeight:700,letterSpacing:.5,marginBottom:8}}>ANSWERED</div>
+                <div style={{fontSize:36,fontWeight:900,color:"#2563eb"}}>{answeredCount}/{questions.length}</div>
               </div>
             </div>
 
-            <div style={{display:"flex",gap:12}}>
-              <button onClick={()=>{setCurrent(0);setScore(0);setAnswered(false);setFinished(false);setResults([]);}}
-                style={{flex:1,padding:"14px",border:`1.5px solid ${subject.color}`,background:"none",color:subject.color,borderRadius:12,fontSize:14,fontWeight:700,cursor:"pointer"}}>
-                🔄 Retry
-              </button>
-              <button onClick={onFinish} style={{padding:"14px",border:"none",borderRadius:12,background:subject.color,color:"#fff",fontSize:13,fontWeight:700,cursor:"pointer"}}>
+            {/* Performance by difficulty */}
+            <div style={{background:"#f8f9fa",borderRadius:16,padding:"20px",marginBottom:28}}>
+              <div style={{fontSize:13,fontWeight:700,marginBottom:16,color:"#333"}}>Performance by Difficulty</div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12}}>
+                {["Easy","Medium","Hard"].map(diff=>{
+                  const total = byDifficulty[diff];
+                  const correct = byDifficulty[`correct${diff}`];
+                  const acc = total>0 ? Math.round((correct/total)*100) : 0;
+                  const colors = {Easy:"#16a34a",Medium:"#d97706",Hard:"#dc2626"};
+                  return (
+                    <div key={diff} style={{textAlign:"center",padding:"12px"}}>
+                      <div style={{fontSize:12,color:"#888",fontWeight:700,marginBottom:8}}>{diff}</div>
+                      <div style={{fontSize:20,fontWeight:900,color:colors[diff]}}>{correct}/{total}</div>
+                      <div style={{fontSize:11,color:"#aaa",fontWeight:700}}>{acc}% Accuracy</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div style={{display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap"}}>
+              <button onClick={onFinish}
+                style={{padding:"14px 28px",background:subject.color,color:"#fff",border:"none",borderRadius:12,fontSize:14,fontWeight:700,cursor:"pointer"}}>
                 Next Topic →
               </button>
             </div>
+          </div>
+
+          {/* Detailed review */}
+          <div style={{marginBottom:40}}>
+            <h2 style={{fontSize:20,fontWeight:800,marginBottom:16}}>Detailed Review</h2>
+            {results.map((r, i)=>(
+              <div key={i} style={{background:"#fff",borderRadius:16,padding:"20px",marginBottom:12,border:`1.5px solid ${r.isCorrect?"#dcfce7":"#fee2e2"}`,boxShadow:"0 1px 4px rgba(0,0,0,.04)"}}>
+                <div style={{display:"flex",alignItems:"flex-start",gap:12}}>
+                  <div style={{width:32,height:32,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,fontWeight:900,background:r.isCorrect?"#dcfce7":"#fee2e2",color:r.isCorrect?"#16a34a":"#dc2626",flexShrink:0}}>
+                    {r.isCorrect ? "✓" : "✗"}
+                  </div>
+                  <div style={{flex:1}}>
+                    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+                      <span style={{fontSize:13,fontWeight:700,color:"#555"}}>Q{i+1}</span>
+                      <DiffBadge difficulty={r.q.difficulty||"Medium"}/>
+                      {!r.userAnswer && <span style={{fontSize:11,background:"#f3f4f6",color:"#666",padding:"2px 8px",borderRadius:12,fontWeight:700}}>Unanswered</span>}
+                    </div>
+                    <p style={{fontSize:15,fontWeight:600,color:"#111",margin:"0 0 12px"}}>{r.q.question}</p>
+                    
+                    {/* Options display */}
+                    <div style={{marginBottom:12}}>
+                      {r.q.options.map(opt=>{
+                        const isCorrectOpt = opt.label === r.q.correct;
+                        const isUserChoice = opt.label === r.userAnswer;
+                        let bgColor = "#f3f4f6", textColor = "#555", borderColor = "#e5e7eb";
+                        
+                        if(isCorrectOpt) { bgColor = "#dcfce7"; textColor = "#16a34a"; borderColor = "#86efac"; }
+                        else if(isUserChoice && !isCorrectOpt) { bgColor = "#fee2e2"; textColor = "#dc2626"; borderColor = "#fca5a5"; }
+                        
+                        return (
+                          <div key={opt.label} style={{display:"flex",alignItems:"center",gap:8,padding:"8px 12px",background:bgColor,border:`1px solid ${borderColor}`,borderRadius:10,marginBottom:6,fontSize:13}}>
+                            <span style={{fontWeight:800,color:textColor}}>{opt.label}.</span>
+                            <span style={{flex:1,color:textColor}}>{opt.text}</span>
+                            {isCorrectOpt && <span style={{fontWeight:700,color:textColor}}>✓ Correct</span>}
+                            {isUserChoice && !isCorrectOpt && <span style={{fontWeight:700,color:textColor}}>✗ Your answer</span>}
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Explanation */}
+                    {r.q.explanation && (
+                      <div style={{background:"#fffbeb",border:"1px solid #fde68a",borderRadius:10,padding:"12px 14px"}}>
+                        <div style={{fontSize:12,fontWeight:700,color:"#92400e",marginBottom:4}}>💡 Explanation</div>
+                        <p style={{margin:0,fontSize:13,color:"#78350f",lineHeight:1.6}}>{r.q.explanation}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
     );
   }
 
-  // ── PRACTICE SCREEN ──
+  // ── PRACTICE SCREEN (WITH SIDEBAR) ──
   const q = questions[current];
-  const timerPct = (timeLeft/30)*100;
-  const timerColor = timeLeft>15?"#16a34a":timeLeft>7?"#d97706":"#dc2626";
-
-  const optionStyle = (label) => {
-    const base = {display:"flex",alignItems:"center",gap:14,padding:"15px 18px",borderRadius:13,border:"1.5px solid",cursor:"pointer",transition:"all .15s",marginBottom:10,background:"#fff",width:"100%",textAlign:"left"};
-    if(!answered) {
-      return {...base, borderColor:selected===label?subject.color:"#e5e7eb", background:selected===label?subject.color+"10":"#fff"};
-    }
-    if(label===q.correct)          return {...base,borderColor:"#16a34a",background:"#f0fdf4",cursor:"default"};
-    if(label===selected)            return {...base,borderColor:"#dc2626",background:"#fff5f5",cursor:"default"};
-    return {...base,borderColor:"#e5e7eb",opacity:.45,cursor:"default"};
-  };
-
-  const labelStyle = (label) => {
-    const base = {width:34,height:34,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:800,flexShrink:0};
-    if(!answered) return {...base,background:selected===label?subject.color:"#f3f4f6",color:selected===label?"#fff":"#555"};
-    if(label===q.correct) return {...base,background:"#dcfce7",color:"#16a34a"};
-    if(label===selected)  return {...base,background:"#fee2e2",color:"#dc2626"};
-    return {...base,background:"#f3f4f6",color:"#aaa"};
-  };
+  const minutes = Math.floor(totalTime / 60);
+  const seconds = totalTime % 60;
+  const timeColor = totalTime > 180 ? "#16a34a" : totalTime > 60 ? "#d97706" : "#dc2626";
+  const answeredCount = Object.keys(answers).length;
 
   return (
-    <div className="fade-in" style={{minHeight:"100vh",background:"#f0f4ff",padding:"24px 20px"}}>
-      <div style={{maxWidth:700,margin:"0 auto"}}>
-        {/* Top bar */}
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20}}>
-          <button onClick={onBack} style={{border:"none",background:"none",color:"#2563eb",fontSize:14,cursor:"pointer",fontWeight:700}}>← Topics</button>
-          <div style={{textAlign:"center"}}>
-            <div style={{fontSize:13,fontWeight:700,color:subject.color}}>{subject.name}</div>
-            <div style={{fontSize:12,color:"#888"}}>{topic}</div>
+    <div style={{minHeight:"100vh",background:"#f0f4ff",display:"flex",overflow:"hidden"}}>
+      {/* Main content with sidebar */}
+      <div style={{flex:1,display:"flex",overflow:"hidden"}}>
+        {/* LEFT SIDEBAR - Question list and controls */}
+        <div style={{width:200,background:"#fff",borderRight:"1px solid #e5e7eb",overflowY:"auto",padding:"16px 12px",display:"flex",flexDirection:"column"}}>
+          {/* Header section */}
+          <div style={{marginBottom:20}}>
+            <button onClick={onBack} style={{border:"none",background:"none",color:"#2563eb",fontSize:13,cursor:"pointer",fontWeight:700,marginBottom:12}}>← Back</button>
+            <div style={{marginBottom:16}}>
+              <div style={{fontSize:13,fontWeight:700,color:"#111",marginBottom:2}}>{subject.name}</div>
+              <div style={{fontSize:11,color:"#888"}}>{topic}</div>
+            </div>
+            
+            {/* Time and answered stats */}
+            <div style={{display:"flex",gap:12,marginBottom:16}}>
+              <div style={{flex:1,textAlign:"center",background:"#f3f4f6",borderRadius:10,padding:"10px 8px"}}>
+                <div style={{fontSize:18,fontWeight:900,color:timeColor}}>{String(minutes).padStart(2,'0')}:{String(seconds).padStart(2,'0')}</div>
+                <div style={{fontSize:9,color:"#888",fontWeight:700,marginTop:2}}>TIME</div>
+              </div>
+              <div style={{flex:1,textAlign:"center",background:"#f3f4f6",borderRadius:10,padding:"10px 8px"}}>
+                <div style={{fontSize:18,fontWeight:900,color:subject.color}}>{answeredCount}/{questions.length}</div>
+                <div style={{fontSize:9,color:"#888",fontWeight:700,marginTop:2}}>ANSWERED</div>
+              </div>
+            </div>
+            <div style={{height:"1px",background:"#e5e7eb",marginBottom:16}}/>
           </div>
-          <div style={{background:subject.color+"18",color:subject.color,padding:"6px 16px",borderRadius:20,fontSize:14,fontWeight:800}}>
-            {current+1} / {questions.length}
+
+          {/* Questions list */}
+          <div style={{fontSize:10,fontWeight:700,color:"#aaa",letterSpacing:.5,marginBottom:12}}>QUESTIONS</div>
+          <div style={{flex:1,overflowY:"auto"}}>
+            {questions.map((_,idx)=>{
+              const isVisited = visited[idx];
+              const indicator = isVisited ? "●" : "○";
+              const bgColor = isVisited ? "#e5e7eb" : "#f3f4f6";
+              const textColor = isVisited ? "#666" : "#aaa";
+              
+              return (
+                <button key={idx}
+                  onClick={()=>goToQuestion(idx)}
+                  style={{
+                    width:"100%",
+                    padding:"10px 12px",
+                    marginBottom:8,
+                    border:`1.5px solid ${idx===current?subject.color:"#e5e7eb"}`,
+                    background:idx===current?subject.color+"10":"#fff",
+                    borderRadius:10,
+                    cursor:"pointer",
+                    display:"flex",
+                    alignItems:"center",
+                    gap:8,
+                    transition:"all .2s",
+                    fontSize:13,
+                    fontWeight:700,
+                    color:idx===current?subject.color:"#333"
+                  }}>
+                  <div style={{
+                    width:20,height:20,
+                    borderRadius:"50%",
+                    display:"flex",alignItems:"center",justifyContent:"center",
+                    fontSize:12,fontWeight:800,
+                    background:bgColor,
+                    color:textColor,
+                    flexShrink:0
+                  }}>
+                    {indicator}
+                  </div>
+                  Q{idx+1}
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Progress bar */}
-        <div style={{marginBottom:16}}>
-          <ProgressBar pct={(current/questions.length)*100} color={subject.color} height={6}/>
-        </div>
-
-        {/* Timer */}
-        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:20}}>
-          <div style={{flex:1,background:"#e5e7eb",borderRadius:999,height:7,overflow:"hidden"}}>
-            <div style={{width:`${timerPct}%`,background:timerColor,height:"100%",borderRadius:999,transition:"width 1s linear, background .3s"}}/>
-          </div>
-          <div style={{fontSize:15,fontWeight:900,color:timerColor,minWidth:36,textAlign:"right"}}>{timeLeft}s</div>
-        </div>
-
-        {/* Score tracker */}
-        <div style={{display:"flex",gap:8,marginBottom:20}}>
-          {questions.map((_,i)=>(
-            <div key={i} style={{flex:1,height:4,borderRadius:999,background:i<results.length?(results[i].isCorrect?"#16a34a":"#dc2626"):i===current?subject.color:"#e5e7eb",transition:"background .3s"}}/>
-          ))}
-        </div>
-
-        {/* Question card */}
-        <div className="fade-in" style={{background:"#fff",borderRadius:20,padding:"28px 26px",marginBottom:18,boxShadow:"0 2px 12px rgba(0,0,0,.06)",border:"1px solid #e5e7eb"}}>
-          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14}}>
-            <span style={{background:subject.color+"18",color:subject.color,padding:"3px 12px",borderRadius:20,fontSize:12,fontWeight:800}}>Q{current+1}</span>
-            <DiffBadge difficulty={q.difficulty||"Medium"}/>
-          </div>
-          <p style={{fontSize:17,fontWeight:600,color:"#111",margin:0,lineHeight:1.7}}>{q.question}</p>
-        </div>
-
-        {/* Options */}
-        <div style={{marginBottom:16}}>
-          {q.options.map(opt=>(
-            <button key={opt.label} style={optionStyle(opt.label)} onClick={()=>!answered && handleAnswer(opt.label)}>
-              <span style={labelStyle(opt.label)}>{opt.label}</span>
-              <span style={{fontSize:15,color:"#222",flex:1}}>{opt.text}</span>
-              {answered && opt.label===q.correct && <span style={{fontSize:20,marginLeft:"auto",flexShrink:0}}>✓</span>}
-              {answered && opt.label===selected && opt.label!==q.correct && <span style={{fontSize:20,marginLeft:"auto",flexShrink:0}}>✗</span>}
-            </button>
-          ))}
-        </div>
-
-        {/* Explanation toggle */}
-        {answered && q.explanation && (
-          <div style={{marginBottom:16}}>
-            <button onClick={()=>setShowExplain(s=>!s)}
-              style={{border:`1px solid ${subject.color}40`,background:subject.color+"08",color:subject.color,padding:"8px 16px",borderRadius:10,fontSize:13,fontWeight:700,cursor:"pointer",marginBottom:showExplain?10:0}}>
-              {showExplain?"▲ Hide":"▼ Show"} Explanation
-            </button>
-            {showExplain && (
-              <div style={{background:"#fffbeb",border:"1px solid #fde68a",borderRadius:14,padding:"16px 18px"}}>
-                <p style={{margin:"0 0 4px",fontSize:13,fontWeight:700,color:"#92400e"}}>💡 Explanation</p>
-                <p style={{margin:0,fontSize:14,color:"#78350f",lineHeight:1.7}}>{q.explanation}</p>
+        {/* RIGHT SIDE - Question and options */}
+        <div style={{flex:1,padding:"24px",overflowY:"auto",display:"flex",flexDirection:"column"}}>
+          <div style={{maxWidth:800,margin:"0 auto",width:"100%"}}>
+            {/* Question card */}
+            {q ? (
+              <div className="fade-in" style={{background:"#fff",borderRadius:16,padding:"24px",marginBottom:24,boxShadow:"0 2px 8px rgba(0,0,0,.04)",border:"1px solid #e5e7eb"}}>
+                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:16}}>
+                  <span style={{background:subject.color+"18",color:subject.color,padding:"4px 12px",borderRadius:20,fontSize:12,fontWeight:800}}>Q{current+1}/{questions.length}</span>
+                  <DiffBadge difficulty={q.difficulty||"Medium"}/>
+                </div>
+                <p style={{fontSize:18,fontWeight:700,color:"#111",margin:0,lineHeight:1.7}}>{q.question}</p>
+              </div>
+            ) : (
+              <div style={{background:"#fff",borderRadius:16,padding:"24px",marginBottom:24,boxShadow:"0 2px 8px rgba(0,0,0,.04)",border:"1px solid #e5e7eb",textAlign:"center"}}>
+                <p style={{color:"#888",fontSize:16}}>Loading question...</p>
               </div>
             )}
+
+            {/* Options */}
+            {q && (
+              <div style={{marginBottom:24}}>
+                {q.options.map(opt=>{
+                  const isSelected = answers[current] === opt.label;
+                  const isCorrect = opt.label === q.correct;
+                  
+                  return (
+                    <button key={opt.label}
+                      onClick={()=>handleAnswer(current, opt.label)}
+                      style={{
+                        width:"100%",
+                        display:"flex",
+                        alignItems:"center",
+                        gap:16,
+                        padding:"16px 18px",
+                        marginBottom:10,
+                        borderRadius:12,
+                        border:`1.5px solid ${isSelected?subject.color:"#e5e7eb"}`,
+                        background:isSelected?subject.color+"10":"#fff",
+                        cursor:"pointer",
+                        transition:"all .2s",
+                        textAlign:"left"
+                      }}
+                      onMouseOver={e=>{if(!isSelected){e.currentTarget.style.borderColor=subject.color+"40";e.currentTarget.style.background="#f9f9f9"}}}
+                      onMouseOut={e=>{if(!isSelected){e.currentTarget.style.borderColor="#e5e7eb";e.currentTarget.style.background="#fff"}}}>
+                      <div style={{width:40,height:40,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,fontWeight:800,background:isSelected?subject.color+"30":"#f3f4f6",color:isSelected?subject.color:"#888",flexShrink:0}}>
+                        {opt.label}
+                      </div>
+                      <span style={{flex:1,fontSize:15,color:"#333",fontWeight:500}}>{opt.text}</span>
+                      {isSelected && <span style={{fontSize:18,fontWeight:700,color:subject.color}}>✓</span>}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Navigation buttons */}
+            <div style={{display:"flex",gap:12,marginTop:24}}>
+              <button onClick={()=>current>0 && setCurrent(current-1)}
+                style={{flex:1,padding:"14px",border:`1.5px solid ${subject.color}`,background:"#fff",color:subject.color,borderRadius:12,fontSize:14,fontWeight:700,cursor:current>0?"pointer":"not-allowed",opacity:current>0?1:.5}}>
+                ← Previous
+              </button>
+              <button onClick={()=>current<questions.length-1?setCurrent(current+1):handleFinish()}
+                style={{flex:1,padding:"14px",background:subject.color,color:"#fff",border:"none",borderRadius:12,fontSize:14,fontWeight:700,cursor:"pointer"}}>
+                {current===questions.length-1 ? "Finish Quiz 🏁" : "Next Question →"}
+              </button>
+            </div>
+
+            {/* Quick finish button */}
+            {answeredCount > 0 && (
+              <button onClick={handleFinish}
+                style={{width:"100%",marginTop:16,padding:"12px",background:"#f3f4f6",color:"#666",border:"none",borderRadius:12,fontSize:13,fontWeight:700,cursor:"pointer"}}>
+                Finish Now ({answeredCount} answered)
+              </button>
+            )}
           </div>
-        )}
-
-        {/* Next button */}
-        {answered && (
-          <button onClick={nextQuestion}
-            style={{width:"100%",padding:"16px",background:subject.color,color:"#fff",border:"none",borderRadius:14,fontSize:16,fontWeight:800,cursor:"pointer",transition:"opacity .2s"}}
-            onMouseOver={e=>e.target.style.opacity=.88} onMouseOut={e=>e.target.style.opacity=1}>
-            {current+1>=questions.length ? "Finish Session 🏁" : "Next Question →"}
-          </button>
-        )}
-
-        {/* Keyboard hint */}
-        {!answered && (
-          <p style={{textAlign:"center",color:"#bbb",fontSize:12,marginTop:12}}>Click an option to answer · Timer resets on next question</p>
-        )}
+        </div>
       </div>
     </div>
   );
 }
 
-  );
-}
+
 
 // ────────────────────────────────────────────────────────────────────
 // ROOT APP (Exported as SubjectsPage)
 // ────────────────────────────────────────────────────────────────────
 export default function SubjectsPage() {
-  const navigate = useNavigate();
+  const { isDarkMode } = useTheme();
   const [screen, setScreen]         = useState("subjects");  // subjects | topics | mcq | dashboard
   const [selSubject, setSelSubject] = useState(null);
   const [selTopic, setSelTopic]     = useState(null);
@@ -957,27 +1270,25 @@ export default function SubjectsPage() {
   // inject global CSS once
   useEffect(()=>{
     const tag = document.createElement("style");
-    tag.innerHTML = GLOBAL_CSS;
+    const globalCss = isDarkMode ? GLOBAL_CSS_DARK : GLOBAL_CSS;
+    tag.innerHTML = globalCss;
     document.head.appendChild(tag);
     return ()=>document.head.removeChild(tag);
-  },[]);
+  },[isDarkMode]);
 
   const goToSubject = (subject) => { setSelSubject(subject); setScreen("topics"); };
   const goToTopic   = (topic)   => { setSelTopic(topic);   setScreen("mcq");    };
   const goBack      = ()        => setScreen("subjects");
   const backToTopics= ()        => setScreen("topics");
   const finishMCQ   = ()        => setScreen("topics");
-  
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/login");
-  };
+
+  const bgColor = isDarkMode ? "#1a1a2e" : "#f0f4ff";
 
   return (
-    <div style={{minHeight:"100vh",background:"#f0f4ff"}}>
+    <div style={{minHeight:"100vh",background:bgColor,transition:"background 0.3s ease"}}>
       <Navbar view={screen} onNavigate={v=>{
         if(v==="subjects") setScreen("subjects");
-      }} onLogout={handleLogout} />
+      }} onLogout={()=>{}} />
 
       {screen==="subjects"  && <SubjectsPageContent onSelectSubject={goToSubject}/>}
       {screen==="topics"    && selSubject && <TopicSelectorPage subject={selSubject} onSelectTopic={goToTopic} onBack={goBack}/>}

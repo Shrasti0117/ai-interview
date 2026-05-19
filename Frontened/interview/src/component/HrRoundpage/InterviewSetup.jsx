@@ -1,10 +1,14 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 /**
  * INTERVIEWACE - InterviewSetup Component
  * A comprehensive setup page with Resume Upload, Language/Mode selection,
  * and real-time Voice/Video testing capabilities.
  */
+
+const API_BASE_URL = "http://localhost:5001";
 
 const styles = `
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
@@ -616,10 +620,12 @@ const VideoPanel = () => {
 // --- MAIN COMPONENT ---
 
 export default function InterviewSetup({ onStart }) {
+  const navigate = useNavigate();
   const [resumeFile, setResumeFile] = useState(null);
   const [lang, setLang] = useState("en");
   const [mode, setMode] = useState("text");
   const [starting, setStarting] = useState(false);
+  const [error, setError] = useState("");
   const fileInputRef = useRef(null);
 
   const handleFileChange = (e) => {
@@ -627,12 +633,74 @@ export default function InterviewSetup({ onStart }) {
     if (file) setResumeFile(file);
   };
 
-  const handleStart = () => {
-    setStarting(true);
-    setTimeout(() => {
-      setStarting(false);
-      if (onStart) onStart({ lang, mode, resumeFile });
-    }, 1800);
+  const handleStart = async () => {
+    // For voice mode, start interview and navigate to voice interview page
+    if (mode === "voice") {
+      setStarting(true);
+      setError("");
+
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/login");
+          return;
+        }
+
+        const formData = new FormData();
+        if (resumeFile) {
+          formData.append("resume", resumeFile);
+        }
+        formData.append("language", lang === "en" ? "english" : "hindi");
+
+        let sessionId = localStorage.getItem("sessionId");
+        if (!sessionId) {
+          sessionId = crypto.randomUUID();
+          localStorage.setItem("sessionId", sessionId);
+        }
+        formData.append("sessionId", sessionId);
+
+        const { data } = await axios.post(
+          `${API_BASE_URL}/api/interview/start`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (data.interviewId && data.question) {
+          navigate("/voice-interview", {
+            state: {
+              interviewId: data.interviewId,
+              initialQuestion: data.question,
+              maxQuestions: data.maxQuestions,
+              usingFallback: data.usingFallback,
+              language: data.language,
+            },
+          });
+        } else {
+          setError("Interview started but question not received.");
+          setStarting(false);
+        }
+      } catch (err) {
+        console.error(err);
+        setError(
+          err.response?.data?.error ||
+            err.response?.data?.message ||
+            err.message ||
+            "Something went wrong"
+        );
+        setStarting(false);
+      }
+    } else {
+      // For text/video modes, use original handler
+      setStarting(true);
+      setTimeout(() => {
+        setStarting(false);
+        if (onStart) onStart({ lang, mode, resumeFile });
+      }, 1800);
+    }
   };
 
   return (
@@ -648,6 +716,22 @@ export default function InterviewSetup({ onStart }) {
           <h1 className="ia-title">Setup Your Interview</h1>
           <p className="ia-subtitle">Configure your preferences for the best AI interview experience</p>
         </header>
+
+        {/* Error Message */}
+        {error && (
+          <div style={{ 
+            maxWidth: "800px", 
+            margin: "20px 0", 
+            padding: "12px 16px", 
+            backgroundColor: "#FCEBEB", 
+            border: "1px solid #E24B4A", 
+            color: "#E24B4A", 
+            borderRadius: "10px",
+            textAlign: "center"
+          }}>
+            {error}
+          </div>
+        )}
 
         {/* Upload Resume Card */}
         <div className="ia-card">

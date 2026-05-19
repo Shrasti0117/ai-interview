@@ -31,14 +31,167 @@
   cursor: pointer;
 }
 
+.subject-card {
+  padding: 25px 15px;
+  border-radius: 12px;
+  box-shadow: 0px 3px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
 .subject-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.1);
 }
 
 .subject-card .icon {
   font-size: 28px;
   margin-bottom: 12px;
+}
+
+.subject-card p {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+}
+
+.more-card {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  color: #666;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.more-card:hover {
+  transform: translateY(-5px);
+}
+
+.more-card .icon {
+  font-size: 32px;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+
+/* 📱 Phone: up to 767px */
+@media (max-width: 767px) {
+  .subjects-section {
+    padding: 40px 16px;
+  }
+
+  .subjects-section h2 {
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+
+  .subjects-section p {
+    font-size: 12px;
+    margin-bottom: 24px;
+  }
+
+  .subjects-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .subject-card {
+    padding: 18px 12px;
+  }
+
+  .subject-card .icon {
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+
+  .subject-card p {
+    font-size: 13px;
+  }
+
+  .more-card .icon {
+    font-size: 28px;
+  }
+}
+
+/* 📲 Tablet: 768px – 1023px */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .subjects-section {
+    padding: 50px 20px;
+  }
+
+  .subjects-section h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  .subjects-section p {
+    font-size: 13px;
+    margin-bottom: 32px;
+  }
+
+  .subjects-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  .subject-card {
+    padding: 22px 14px;
+  }
+
+  .subject-card .icon {
+    font-size: 26px;
+    margin-bottom: 10px;
+  }
+
+  .subject-card p {
+    font-size: 14px;
+  }
+
+  .more-card .icon {
+    font-size: 30px;
+  }
+}
+
+/* 💻 Desktop: 1024px and above */
+@media (min-width: 1024px) {
+  .subjects-section {
+    padding: 60px 20px;
+  }
+
+  .subjects-section h2 {
+    font-size: 28px;
+    margin-bottom: 10px;
+  }
+
+  .subjects-section p {
+    font-size: 14px;
+    margin-bottom: 40px;
+  }
+
+  .subjects-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+  }
+
+  .subject-card {
+    padding: 25px 15px;
+  }
+
+  .subject-card .icon {
+    font-size: 28px;
+    margin-bottom: 12px;
+  }
+
+  .subject-card p {
+    font-size: 15px;
+  }
+
+  .more-card .icon {
+    font-size: 32px;
+  }
 }
 
 
