@@ -1,0 +1,233 @@
+.features-section {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.features-header h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #222;
+}
+
+.features-header p {
+  margin-top: 8px;
+  color: #555;
+}
+
+.features-cards {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 40px;
+  flex-wrap: wrap; 
+}
+
+.feature-card {
+  flex: 1;
+  min-width: 280px;
+  max-width: 350px;
+  background: white;
+  border-radius: 16px;
+  padding: 25px 20px;
+  text-align: left;
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.05);
+  transition: 0.3s;
+  text-decoration: none;
+}
+
+.feature-card:hover {
+  transform: translateY(-8px);
+}
+
+.feature-card h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.feature-card p {
+  color: #555;
+  font-size: 17px;
+  margin-bottom: 15px;
+}
+.feature-card ul li svg {
+  color: #22c55e;
+  font-size: 16px;
+ 
+}
+.hr {
+  background: #eef4ff;
+}
+
+.tech {
+  background: #f7f0ff;
+}
+
+.gd {
+  background: #f0fff4;
+}
+
+.feature-card ul {
+  list-style: none;        
+}
+
+ .feature-card ul li {
+  color: #555;
+  margin: 5px 0;
+   font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+} 
+
+ .feature-card ul li a{
+ text-decoration: none;
+ color: inherit;
+ }
+
+/* ===== RESPONSIVE DESIGN ===== */
+
+/* 📱 Phone: up to 767px */
+@media (max-width: 767px) {
+  .features-section {
+    padding: 40px 16px;
+  }
+
+  .features-header h2 {
+    font-size: 20px;
+  }
+
+  .features-header p {
+    font-size: 12px;
+    margin-top: 6px;
+  }
+
+  .features-cards {
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  .feature-card {
+    min-width: 100%;
+    max-width: 100%;
+    padding: 18px 16px;
+  }
+
+  .feature-card h3 {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  .feature-card p {
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+
+  .feature-card ul li {
+    font-size: 13px;
+    margin: 4px 0;
+    gap: 4px;
+  }
+
+  .feature-card ul li svg {
+    font-size: 14px;
+  }
+}
+
+/* 📲 Tablet: 768px – 1023px */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .features-section {
+    padding: 50px 20px;
+  }
+
+  .features-header h2 {
+    font-size: 24px;
+  }
+
+  .features-header p {
+    font-size: 13px;
+    margin-top: 8px;
+  }
+
+  .features-cards {
+    gap: 24px;
+    margin-top: 32px;
+  }
+
+  .feature-card {
+    min-width: calc(50% - 12px);
+    max-width: calc(50% - 12px);
+    padding: 22px 18px;
+  }
+
+  .feature-card h3 {
+    font-size: 18px;
+    margin-bottom: 9px;
+  }
+
+  .feature-card p {
+    font-size: 15px;
+    margin-bottom: 12px;
+  }
+
+  .feature-card ul li {
+    font-size: 14px;
+    margin: 5px 0;
+    gap: 5px;
+  }
+
+  .feature-card ul li svg {
+    font-size: 15px;
+  }
+}
+
+/* 💻 Desktop: 1024px and above */
+@media (min-width: 1024px) {
+  .features-section {
+    padding: 60px 20px;
+  }
+
+  .features-header h2 {
+    font-size: 28px;
+  }
+
+  .features-header p {
+    margin-top: 8px;
+    font-size: 14px;
+  }
+
+  .features-cards {
+    gap: 30px;
+    margin-top: 40px;
+  }
+
+  .feature-card {
+    flex: 1;
+    min-width: 280px;
+    max-width: 350px;
+    padding: 25px 20px;
+  }
+
+  .feature-card h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+
+  .feature-card p {
+    font-size: 17px;
+    margin-bottom: 15px;
+  }
+
+  .feature-card ul li {
+    font-size: 16px;
+    margin: 5px 0;
+    gap: 6px;
+  }
+
+  .feature-card ul li svg {
+    font-size: 16px;
+  }
+}
+
+
+

@@ -1,0 +1,126 @@
+/* Custom CyberSecurity Proctoring Effects */
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+
+:root {
+  --bg-cyber: #0a0a0f;
+  --accent-neon: #00ff88;
+  --accent-cyan: #00d4ff;
+  --danger-red: #ff3333;
+  --warning-orange: #ff9900;
+  --shadow-neon: 0 0 10px rgba(0, 255, 136, 0.3);
+}
+
+.proctor-container {
+  font-family: 'JetBrains Mono', monospace;
+  background-color: var(--bg-cyber);
+  color: white;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Scanline Effect */
+.scanline-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 0, 0, 0.25) 50%
+  ),
+  linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.06),
+    rgba(0, 255, 0, 0.02),
+    rgba(0, 0, 255, 0.06)
+  );
+  z-index: 9999;
+  background-size: 100% 4px, 3px 100%;
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+/* Glitch Animation */
+@keyframes glitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+  100% { transform: translate(0); }
+}
+
+.glitch-text {
+  animation: glitch 0.2s infinite;
+  text-shadow: 2px 0 var(--danger-red), -2px 0 var(--accent-cyan);
+}
+
+/* Pulse Animation */
+@keyframes pulse-red {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--danger-red);
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse-red 1.5s infinite;
+  box-shadow: 0 0 8px var(--danger-red);
+}
+
+/* Glassmorphism Cards */
+.cyber-card {
+  background: rgba(15, 15, 25, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 255, 136, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.cyber-border-neon {
+  border-color: var(--accent-neon);
+  box-shadow: var(--shadow-neon);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-cyber);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--accent-neon);
+  border-radius: 3px;
+}
+
+/* Fullscreen Overlay */
+.overlay-blocking {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Floating Alerts */
+.violation-toast {
+  animation: slideInRight 0.3s ease-out forwards;
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
