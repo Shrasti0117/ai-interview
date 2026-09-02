@@ -27,7 +27,7 @@ import InterviewReady from "./component/Pages/InterviewReady";
 
 const AppContent = () => {
   const location = useLocation();
-  const hideGlobalNavbar = location.pathname === "/login" || location.pathname === "/progress" || location.pathname === "/subjects" || location.pathname === "/dashboard" || location.pathname === "/technical-round" || location.pathname === "/test" || location.pathname === "/aptitude" || location.pathname === "/hr-aptitude" || location.pathname === "/proctoring";
+  const hideGlobalNavbar = location.pathname === "/login";
 
   const content = (
     <>
