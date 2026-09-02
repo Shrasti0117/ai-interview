@@ -96,19 +96,6 @@ const AptitudeRound = () => {
       <div className="absolute top-[-10%] right-[-10%] w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
       <div className="absolute bottom-[-20%] left-[20%] w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
 
-      {/* Global Navbar / Logo */}
-      <nav className="w-full px-6 py-4 flex items-center justify-between z-10 relative">
-        <div className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
-          <img src="/logo.png" alt="InterviewAce Logo" style={{ width: 44, height: 44, objectFit: "cover", borderRadius: "50%", boxShadow: "0 4px 12px rgba(0,0,0,0.12)", transition: "all 0.3s ease" }} 
-            onMouseEnter={e => e.currentTarget.style.transform = "scale(1.1)"}
-            onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
-          />
-          <span className="font-extrabold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-800 tracking-tight">
-            InterviewAce
-          </span>
-        </div>
-      </nav>
-
       {/* Main Content Area - Centered and fills remaining height */}
       <main className="flex-1 w-full max-w-6xl mx-auto flex flex-col justify-center px-4 md:px-8 py-6 z-10">
         

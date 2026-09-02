@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import SecurityWrapper from "../SecurityWrapper";
 
@@ -61,7 +60,6 @@ const CATEGORIES = [
 // MAIN COMPONENT
 // ────────────────────────────────────────────────────────────────────
 export default function AptitudeRound() {
-  const navigate = useNavigate();
 
   // Navigation & Flow State
   const [screen, setScreen] = useState("home"); // home, quiz, result
@@ -248,18 +246,6 @@ export default function AptitudeRound() {
 
     return (
       <div style={{ backgroundColor: '#f3f4f6', minHeight: '100vh', fontFamily: "'Segoe UI', sans-serif", margin: 0, padding: 0 }}>
-        {/* Navbar */}
-        <nav style={{ borderTop: '4px solid #7f1d1d', backgroundColor: 'white', padding: '14px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', borderRight: '4px solid #22c55e' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }} onClick={() => navigate('/')}>
-            <img src="/logo.png" alt="Logo" style={{ width: 44, height: 44, objectFit: "cover", borderRadius: "50%", boxShadow: "0 4px 12px rgba(0,0,0,0.12)", transition: "all 0.3s ease" }} 
-              onMouseEnter={e => e.currentTarget.style.transform = "scale(1.1)"}
-              onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
-            />
-            <div style={{ color: '#2563eb', fontWeight: 800, fontSize: '20px' }}>InterviewAce</div>
-          </div>
-          <div style={{ width: '4px', height: '20px' }}></div> {/* Spacer for symmetry */}
-        </nav>
-
         {/* Content Area */}
         <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '32px 24px' }}>
           {/* Hero */}
@@ -352,10 +338,10 @@ export default function AptitudeRound() {
     return (
       <SecurityWrapper>
         <div style={{ backgroundColor: '#f3f4f6', minHeight: '100vh', fontFamily: "'Segoe UI', sans-serif" }}>
-          <nav style={{ backgroundColor: 'white', padding: '16px 24px', display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #e5e7eb' }}>
+          <div style={{ backgroundColor: 'white', padding: '16px 24px', display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #e5e7eb' }}>
             <span style={{ fontWeight: 800, color: '#111827' }}>Aptitude Arena</span>
             <span style={{ fontWeight: 700, color: '#2563eb' }}>{formatTimer(seconds)}</span>
-          </nav>
+          </div>
           <div style={{ maxWidth: '800px', margin: '40px auto', padding: '0 24px' }}>
             <div style={{ backgroundColor: 'white', borderRadius: '16px', padding: '32px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>

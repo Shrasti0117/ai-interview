@@ -320,30 +320,6 @@ const TechnicalRoundPage = () => {
         }
       `}</style>
 
-      {/* NAVBAR */}
-      <nav className="ia-nav">
-        <div style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} onClick={() => navigate("/")}>
-          <img src="/logo.png" alt="Logo" style={{ width: 44, height: 44, objectFit: "cover", borderRadius: "50%", boxShadow: "0 4px 12px rgba(0,0,0,0.12)", transition: "all 0.3s ease" }} 
-            onMouseEnter={e => e.currentTarget.style.transform = "scale(1.1)"}
-            onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
-          />
-          <div style={{ fontWeight: '800', fontSize: '1.3rem', color: '#1e293b', letterSpacing: '-0.5px' }}>
-            Interview<span style={{ color: '#2563eb' }}>Ace</span>
-          </div>
-        </div>
-        <ul style={{ display: 'flex', gap: '2rem', listStyle: 'none' }}>
-          {["Home", "Dashboard", "Technical Hub", "Progress"].map(n => (
-            <li key={n}>
-              <button onClick={(e) => { e.preventDefault(); if(n === 'Technical Hub') handleBackToHub(); else navigate(n === 'Home' ? '/' : `/${n.toLowerCase().replace(' ', '-')}`); }} 
-                 style={{ background: 'none', border: 'none', textDecoration: 'none', fontSize: '.92rem', fontWeight: 600, color: (n === 'Technical Hub' && activeSubPage === 'hub') ? '#2563eb' : '#64748b', transition: 'color 0.2s', cursor: 'pointer' }}>
-                {n}
-              </button>
-            </li>
-          ))}
-        </ul>
-        <button onClick={handleLogout} style={{ background: '#1e293b', color: '#fff', border: 'none', padding: '9px 20px', borderRadius: '10px', fontSize: '.88rem', fontWeight: '700', cursor: 'pointer', transition: 'background 0.2s' }}>Logout</button>
-      </nav>
-
       <main>
         {activeSubPage === 'hub' ? renderHub() : (
           <div className="ia-section" style={{ paddingTop: '3rem' }}>

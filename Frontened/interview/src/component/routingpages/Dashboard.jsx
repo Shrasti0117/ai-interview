@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../../context/ThemeContext";
-import Navbar from "../Navbar/Navbar";
 
 // ─── REUSABLE COMPONENTS ─────────────────────────────────────────────────────
 
@@ -81,8 +80,6 @@ export default function Dashboard() {
   return (
     <div style={{ background: bgColor, minHeight: "100vh", fontFamily: "'Sora', sans-serif", transition: "background 0.3s ease" }}>
       
-      <Navbar />
-
       <div style={{ maxWidth: 1150, margin: "0 auto", padding: "36px 20px 80px" }}>
         
         {/* Header */}

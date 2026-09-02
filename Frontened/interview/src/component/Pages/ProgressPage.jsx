@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
-import ProfileSidebar from '../ProfileSidebar/ProfileSidebar';
 import './ProgressPage.css';
 
 // ─── DATA ────────────────────────────────────────────────────────────────────
@@ -536,7 +534,6 @@ function AchievementsTab() {
 // ─── MAIN PAGE ────────────────────────────────────────────────────────────────
 
 export default function ProgressPage() {
-  const navigate = useNavigate();
   const { isDarkMode } = useTheme();
   const [activeTab, setActiveTab] = useState("Overview");
 
@@ -547,38 +544,8 @@ export default function ProgressPage() {
   const started  = allSubjects.filter(s=>s.progress>0).length;
 
   const bgColor = isDarkMode ? "#1a1a2e" : "#f0f4ff";
-  const navBgColor = isDarkMode ? "#16213e" : "#fff";
-  const navBorderColor = isDarkMode ? "#2d3561" : "#e8eaed";
-  const textColor = isDarkMode ? "#e0e0e0" : "#5f6368";
-  const activeColor = isDarkMode ? "#64b5f6" : "#1a73e8";
-
   return (
     <div style={{fontFamily:"'Sora',sans-serif",background:bgColor,minHeight:"100vh",transition:"background 0.3s ease"}}>
-
-      {/* NAVBAR */}
-      <nav style={{background:navBgColor,borderBottom:`1px solid ${navBorderColor}`,height:62,
-        padding:"0 32px",display:"flex",alignItems:"center",justifyContent:"space-between",
-        position:"sticky",top:0,zIndex:200,transition:"all 0.3s ease"}}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} onClick={() => navigate && navigate("/")}>
-          <img src="/logo.png" alt="Logo" style={{ width: 44, height: 44, objectFit: "cover", borderRadius: "50%", boxShadow: "0 4px 12px rgba(0,0,0,0.12)", transition: "all 0.3s ease" }} 
-            onMouseEnter={e => e.currentTarget.style.transform = "scale(1.1)"}
-            onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
-          />
-          <div style={{fontWeight:800,fontSize:20,color:activeColor,letterSpacing:-0.5,transition:"color 0.3s ease"}}>InterviewAce</div>
-        </div>
-        <div style={{display:"flex",gap:28,fontSize:15}}>
-          {["Home","Dashboard","Subjects","Progress","Interview Rounds","Test"].map(n=>(
-            <span key={n} 
-              onClick={() => navigate(n === "Home" ? "/" : `/${n.toLowerCase().replace(' ', '-')}`)}
-              style={{cursor:"pointer",fontWeight:n==="Progress"?700:400,
-              color:n==="Progress"?activeColor:textColor,
-              borderBottom:n==="Progress"?`2px solid ${activeColor}`:"2px solid transparent",paddingBottom:4,transition:"all 0.2s"}}>
-              {n}
-            </span>
-          ))}
-        </div>
-        <ProfileSidebar />
-      </nav>
 
       <div style={{maxWidth:1150,margin:"0 auto",padding:"36px 20px 72px"}}>
 

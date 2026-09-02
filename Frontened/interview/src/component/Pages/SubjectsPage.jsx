@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTheme } from "../../context/ThemeContext";
-import ProfileSidebar from "../ProfileSidebar/ProfileSidebar";
 
 /* ═══════════════════════════════════════════════════════════════════
    INTERVIEWACE — Complete Frontend
@@ -576,47 +575,6 @@ function CircleRing({ pct, color, size=54 }) {
 
 function Spinner({ color="#2563eb" }) {
   return <div className="spin" style={{width:36,height:36,border:`4px solid ${color}30`,borderTop:`4px solid ${color}`,borderRadius:"50%"}} />;
-}
-
-// ────────────────────────────────────────────────────────────────────
-// NAVBAR
-// ────────────────────────────────────────────────────────────────────
-function Navbar({ view, onNavigate, onLogout }) {
-  const navigate = useNavigate();
-  const { isDarkMode } = useTheme();
-  const links = ["Home","Dashboard","Subjects","Progress","Interview Rounds","Test"];
-  
-  const handleNav = (n) => {
-    if (n === "Subjects") onNavigate("subjects");
-    else navigate(n === "Home" ? "/" : `/${n.toLowerCase().replace(' ', '-')}`);
-  };
-
-  const bgColor = isDarkMode ? "#16213e" : "#fff";
-  const borderColor = isDarkMode ? "#2d3561" : "#e5e7eb";
-  const textColor = isDarkMode ? "#e0e0e0" : "#555";
-  const primaryColor = "#2563eb";
-
-  return (
-    <nav style={{background:bgColor,borderBottom:`1px solid ${borderColor}`,padding:"0 28px",display:"flex",alignItems:"center",justifyContent:"space-between",height:60,position:"sticky",top:0,zIndex:200,boxShadow:"0 1px 4px rgba(0,0,0,.06)",transition:"all 0.3s ease"}}>
-      <div style={{display:"flex",alignItems:"center",gap:10, cursor: "pointer"}} onClick={() => navigate("/")}>
-          <img src="/logo.png" alt="Logo" style={{ width: 44, height: 44, objectFit: "cover", borderRadius: "50%", boxShadow: "0 4px 12px rgba(0,0,0,0.12)", transition: "all 0.3s ease" }} 
-            onMouseEnter={e => e.currentTarget.style.transform = "scale(1.1)"}
-            onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
-          />
-        <span style={{fontWeight:900,fontSize:19,color:isDarkMode?"#e0e0e0":"#111",letterSpacing:-.3,transition:"color 0.3s ease"}}>InterviewAce</span>
-      </div>
-      <div className="navbar-links" style={{display:"flex",gap:6}}>
-        {links.map(n=>(
-          <button key={n} onClick={()=>handleNav(n)}
-            style={{background:"none",border:"none",fontSize:14,color:(n==="Subjects" && view!=="dashboard")?primaryColor:textColor,fontWeight:(n==="Subjects" && view!=="dashboard")?700:500,cursor:"pointer",padding:"6px 12px",borderRadius:8,borderBottom:(n==="Subjects" && view!=="dashboard")?`2px solid ${primaryColor}`:"2px solid transparent",transition:"all .15s"}}
-            onMouseOver={e=>{if(n!=="Subjects")e.currentTarget.style.background=isDarkMode?"#2d3561":"#f3f4f6"}}
-            onMouseOut={e=>e.currentTarget.style.background="none"}
-          >{n}</button>
-        ))}
-      </div>
-      <ProfileSidebar />
-    </nav>
-  );
 }
 
 // ────────────────────────────────────────────────────────────────────
@@ -1300,10 +1258,6 @@ export default function SubjectsPage() {
 
   return (
     <div style={{minHeight:"100vh",background:bgColor,transition:"background 0.3s ease"}}>
-      <Navbar view={screen} onNavigate={v=>{
-        if(v==="subjects") setScreen("subjects");
-      }} onLogout={()=>{}} />
-
       {screen==="subjects"  && <SubjectsPageContent onSelectSubject={goToSubject}/>}
       {screen==="topics"    && selSubject && <TopicSelectorPage subject={selSubject} onSelectTopic={goToTopic} onBack={goBack}/>}
       {screen==="mcq"       && selSubject && selTopic &&

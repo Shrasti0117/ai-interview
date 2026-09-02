@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import Navbar from "../Navbar/Navbar";
 import SecurityWrapper from "../SecurityWrapper";
 
 const STYLES = `
@@ -1092,7 +1091,6 @@ export default function TestPage() {
   return (
     <div className="test-page-container">
       <style>{STYLES}</style>
-      {stage!=="arena"&&<Navbar stage={stage}/>}
       {stage==="configurator"&&<TestConfigurator onStart={handleStart}/>}
       {stage==="arena"&&testConfig&&(
         <SecurityWrapper>
@@ -1100,10 +1098,7 @@ export default function TestPage() {
         </SecurityWrapper>
       )}
       {stage==="report"&&testResult&&(
-        <>
-          <Navbar stage={stage}/>
-          <MasteryReport data={testResult} onRetake={handleRetake} onPracticeWeak={handlePracticeWeak}/>
-        </>
+        <MasteryReport data={testResult} onRetake={handleRetake} onPracticeWeak={handlePracticeWeak}/>
       )}
     </div>
   );
