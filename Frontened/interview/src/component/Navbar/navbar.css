@@ -1,0 +1,223 @@
+
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --text-primary: #1a1a1a;
+  --text-secondary: #555555;
+  --border-color: #e0e0e0;
+}
+
+.home-container {
+  background-color: var(--bg-primary);
+  transition: background-color 0.3s ease;
+}
+
+.home-container.dark-mode {
+  background-color: var(--bg-primary);
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px 0 20px;
+  background-color: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.navbar.dark-mode {
+  background-color: var(--bg-primary);
+  border-bottom-color: var(--border-color);
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.logo:hover {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+}
+
+.brand-name {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--text-primary);
+  transition: color 0.3s ease;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap:30px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: var(--text-primary);
+  font-weight: 500;
+  padding: 0 12px;
+  transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: #007bff;
+}
+
+.nav-links li:hover {
+  color: #2563eb;
+  cursor: pointer;
+}
+
+.login_btn {
+  background-color: #2563eb;     
+  color: white;                   
+  border: none;                  
+  padding: 8px 18px;              
+  border-radius: 6px;             
+  cursor: pointer;               
+  font-weight: 600;             
+  transition: all 0.3s ease;      
+  margin-left: 20px; 
+  margin-bottom: 20px;             
+}
+
+.login_btn:hover {
+  background-color: #1e4fd3;      
+  transform: translateY(-2px);   
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+.login_btn:active {
+  transform: translateY(0);      
+  box-shadow: none;
+}
+.login_btn a {
+  text-decoration: none;
+  color: white; 
+}
+
+/* Responsive Design */
+
+/* 📱 Phone: up to 767px */
+@media (max-width: 767px) {
+  .navbar {
+    padding: 0 12px;
+    height: auto;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .logo-section {
+    gap: 8px;
+    flex: 1;
+  }
+
+  .logo {
+    width: 36px;
+    height: 36px;
+  }
+
+  .brand-name {
+    font-size: 16px;
+  }
+
+  .nav-links {
+    display: none;
+    gap: 10px;
+    font-size: 12px;
+  }
+
+  .login_btn {
+    padding: 6px 14px;
+    font-size: 12px;
+    margin-left: 8px;
+    margin-bottom: 0;
+  }
+}
+
+/* 📲 Tablet: 768px – 1023px */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .navbar {
+    padding: 0 16px;
+    gap: 12px;
+  }
+
+  .logo-section {
+    gap: 10px;
+  }
+
+  .logo {
+    width: 40px;
+    height: 40px;
+  }
+
+  .brand-name {
+    font-size: 18px;
+  }
+
+  .nav-links {
+    gap: 16px;
+    font-size: 13px;
+  }
+
+  .nav-links a {
+    padding: 0 8px;
+  }
+
+  .login_btn {
+    padding: 7px 16px;
+    font-size: 13px;
+    margin-left: 12px;
+    margin-bottom: 0;
+  }
+}
+
+/* 💻 Laptop/Desktop: 1024px and above */
+@media (min-width: 1024px) {
+  .navbar {
+    padding: 0 20px;
+  }
+
+  .logo-section {
+    gap: 10px;
+  }
+
+  .logo {
+    width: 44px;
+    height: 44px;
+  }
+
+  .brand-name {
+    font-size: 24px;
+  }
+
+  .nav-links {
+    gap: 30px;
+    font-size: 14px;
+  }
+
+  .nav-links a {
+    padding: 0 12px;
+  }
+
+  .login_btn {
+    padding: 8px 18px;
+    font-size: 14px;
+    margin-left: 20px;
+  }
+}
